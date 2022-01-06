@@ -10,9 +10,14 @@ import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import dtu.ws.fastmoney.BankService;
+import dtu.ws.fastmoney.BankServiceService;
+
 public class SimpleDTUPay {
 	Client c;
 	WebTarget r;
+	
+	BankService bank = new BankServiceService().getBankServicePort();
 	
 	public SimpleDTUPay() {
 		c = ClientBuilder.newClient();
@@ -32,5 +37,15 @@ public class SimpleDTUPay {
 	
 	public List<Payment> getPayments(){
 		return r.path("payments").request().get(new GenericType<List<Payment>>(){});
+	}
+
+	public String registerCustomer(String bankID) {
+		return r.path("customers").request().post(Entity.entity(bankID, MediaType.APPLICATION_JSON))
+											 .readEntity(String.class);
+	}
+
+	public boolean customerIsRegistered(String cid) {
+		List<String> customers = r.path("customers").request().get(new GenericType<List<String>>(){});
+		return customers.contains(cid);
 	}
 }
