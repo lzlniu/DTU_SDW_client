@@ -1,5 +1,7 @@
 package dtu.pay;
 
+import java.util.List;
+
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
@@ -16,5 +18,9 @@ public class SimpleDTUPay {
 	public boolean pay(int amount, String cid, String mid) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+	
+	public List<Payment> getPayments(){
+		return null;
 	}
 }

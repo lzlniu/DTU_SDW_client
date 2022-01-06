@@ -31,8 +31,8 @@ public class SimpleDTUPaySteps {
 	
 	
 	//TODO implement these tests
-	@Given("a successful payment of {string} kr from customer {string} to merchant {string}")
-	public void aSuccessfulPaymentOfKrFromCustomerToMerchant(String string, String string2, String string3) {
+	@Given("a successful payment of {int} kr from customer {string} to merchant {string}")
+	public void aSuccessfulPaymentOfKrFromCustomerToMerchant(Integer int1, String string, String string2) {
 	    // Write code here that turns the phrase above into concrete actions
 	    throw new io.cucumber.java.PendingException();
 	}
@@ -43,14 +43,8 @@ public class SimpleDTUPaySteps {
 	    throw new io.cucumber.java.PendingException();
 	}
 
-	@Then("the list contains a payments where customer {string} paid {string} kr to merchant {string}")
-	public void theListContainsAPaymentsWhereCustomerPaidKrToMerchant(String string, String string2, String string3) {
-	    // Write code here that turns the phrase above into concrete actions
-	    throw new io.cucumber.java.PendingException();
-	}
-
-	@When("the merchant initiates a payment for {string} kr by the customer")
-	public void theMerchantInitiatesAPaymentForKrByTheCustomer(String string) {
+	@Then("the list contains a payments where customer {string} paid {int} kr to merchant {string}")
+	public void theListContainsAPaymentsWhereCustomerPaidKrToMerchant(String string, int int1, String string3) {
 	    // Write code here that turns the phrase above into concrete actions
 	    throw new io.cucumber.java.PendingException();
 	}
