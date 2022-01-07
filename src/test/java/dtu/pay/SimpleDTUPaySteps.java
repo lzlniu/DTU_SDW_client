@@ -14,6 +14,7 @@ import dtu.ws.fastmoney.BankServiceException_Exception;
 import dtu.ws.fastmoney.User;
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
+import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -189,6 +190,39 @@ public class SimpleDTUPaySteps {
 	@Then("an error message is returned saying {string}")
 	public void anErrorMessageIsReturnedSaying(String string) {
 		assertEquals(string, e.getMessage());
+	}
+
+	@Given("that the customer is deleted from dtu.pay")
+	public void thatTheCustomerIsDeletedFromDtuPay() throws BankServiceException_Exception {
+		dtuPay.bank.retireAccount(bankIDCustomer);
+		bankAccounts.remove(bankIDCustomer);
+	}
+
+	@Given("a successful payment of {bigdecimal} kr")
+	public void aSuccessfulPaymentOfKr(BigDecimal amount) throws Exception {
+		successful = dtuPay.pay(amount,cid,mid);
+	}
+
+	@Then("the list contains a payments where customer paid {bigdecimal} kr")
+	public void theListContainsAPaymentsWhereCustomerPaidKr(BigDecimal amount) {
+		Payment p = new Payment(cid, mid, amount);
+		assertTrue(payments.get(payments.size()-1).equals(p));
+	}
+
+	@Given("a customer : {string} that is not registered with DTU pay")
+	public void aCustomerThatIsNotRegisteredWithDTUPay(String arg0) {
+		cid = arg0;
+	}
+
+	@Given("a merchant : {string} that is not registered with DTU pay")
+	public void aMerchantThatIsNotRegisteredWithDTUPay(String arg0) {
+		mid = arg0;
+	}
+
+	@Given("that the merchant is deleted from dtu.pay")
+	public void thatTheMerchantIsDeletedFromDtuPay() throws BankServiceException_Exception {
+		dtuPay.bank.retireAccount(bankIDMerchant);
+		bankAccounts.remove(bankIDMerchant);
 	}
 }
 
