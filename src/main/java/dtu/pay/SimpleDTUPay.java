@@ -18,7 +18,7 @@ public class SimpleDTUPay {
 	Client c;
 	WebTarget r;
 	
-	BankService bank = new BankServiceService().getBankServicePort();
+
 	
 	public SimpleDTUPay() {
 		c = ClientBuilder.newClient();

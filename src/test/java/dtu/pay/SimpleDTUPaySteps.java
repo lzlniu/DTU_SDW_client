@@ -9,9 +9,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import dtu.ws.fastmoney.AccountInfo;
-import dtu.ws.fastmoney.BankServiceException_Exception;
-import dtu.ws.fastmoney.User;
+import dtu.ws.fastmoney.*;
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.And;
@@ -27,6 +25,7 @@ public class SimpleDTUPaySteps {
 	boolean successful;
 	List<Payment> payments;
 	Exception e;
+	BankService bank = new BankServiceService().getBankServicePort();
 	
 	private User createUser(String CPR, String first, String last) {
 		User user = new User();
@@ -45,7 +44,7 @@ public class SimpleDTUPaySteps {
 	public void deleteCreatedBankAccounts() {
 		for (String account : bankAccounts) {
 			try {
-				dtuPay.bank.retireAccount(account);
+				bank.retireAccount(account);
 			} catch (BankServiceException_Exception e) {
 				e.printStackTrace();
 			}
@@ -58,7 +57,7 @@ public class SimpleDTUPaySteps {
 	    lastName = "Hansen";
 	    CPR = "090701-7617";
 	    try {
-			bankIDCustomer = dtuPay.bank.createAccountWithBalance(createUser(CPR,firstName,lastName), bigDecimal);
+			bankIDCustomer = bank.createAccountWithBalance(createUser(CPR,firstName,lastName), bigDecimal);
 			bankAccounts.add(bankIDCustomer);
 		} catch (BankServiceException_Exception e) {
 			e.printStackTrace();
@@ -90,7 +89,7 @@ public class SimpleDTUPaySteps {
 		lastName = "Bonghoved";
 		CPR = "666666-9999";
 		try {
-			bankIDMerchant = dtuPay.bank.createAccountWithBalance(createUser(CPR,firstName,lastName), bigDecimal);
+			bankIDMerchant = bank.createAccountWithBalance(createUser(CPR,firstName,lastName), bigDecimal);
 			bankAccounts.add(bankIDMerchant);
 		} catch (BankServiceException_Exception e) {
 			e.printStackTrace();
@@ -129,13 +128,13 @@ public class SimpleDTUPaySteps {
 
 	@Then("the balance of the customer at the bank is {bigdecimal} kr")
 	public void theBalanceOfTheCustomerAtTheBankIsKr(BigDecimal bigDecimal) throws BankServiceException_Exception {
-	    BigDecimal balanceC = dtuPay.bank.getAccount(bankIDCustomer).getBalance();
+	    BigDecimal balanceC = bank.getAccount(bankIDCustomer).getBalance();
 		assertEquals(bigDecimal,balanceC);
 	}
 
 	@Then("the balance of the merchant at the bank is {bigdecimal} kr")
 	public void theBalanceOfTheMerchantAtTheBankIsKr(BigDecimal bigDecimal) throws BankServiceException_Exception {
-		BigDecimal balanceM = dtuPay.bank.getAccount(bankIDMerchant).getBalance();
+		BigDecimal balanceM = bank.getAccount(bankIDMerchant).getBalance();
 		assertEquals(bigDecimal,balanceM);
 	}
 
@@ -194,7 +193,7 @@ public class SimpleDTUPaySteps {
 
 	@Given("that the customer is deleted from dtu.pay")
 	public void thatTheCustomerIsDeletedFromDtuPay() throws BankServiceException_Exception {
-		dtuPay.bank.retireAccount(bankIDCustomer);
+		bank.retireAccount(bankIDCustomer);
 		bankAccounts.remove(bankIDCustomer);
 	}
 
@@ -221,7 +220,7 @@ public class SimpleDTUPaySteps {
 
 	@Given("that the merchant is deleted from dtu.pay")
 	public void thatTheMerchantIsDeletedFromDtuPay() throws BankServiceException_Exception {
-		dtuPay.bank.retireAccount(bankIDMerchant);
+		bank.retireAccount(bankIDMerchant);
 		bankAccounts.remove(bankIDMerchant);
 	}
 }
