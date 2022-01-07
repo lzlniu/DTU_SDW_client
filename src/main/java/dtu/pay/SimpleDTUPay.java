@@ -1,5 +1,6 @@
 package dtu.pay;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import javax.ws.rs.client.Client;
@@ -24,7 +25,7 @@ public class SimpleDTUPay {
 		r = c.target("http://localhost:8080/");
 	}
 
-	public boolean pay(int amount, String cid, String mid) throws Exception {
+	public boolean pay(BigDecimal amount, String cid, String mid) throws Exception {
 		Payment p = new Payment(cid, mid, amount);
 		Response response = r.path("payments").request().
 						   post(Entity.entity(p, MediaType.APPLICATION_JSON));

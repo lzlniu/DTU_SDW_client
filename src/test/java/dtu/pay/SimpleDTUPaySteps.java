@@ -20,7 +20,7 @@ import io.cucumber.java.en.When;
 
 public class SimpleDTUPaySteps {
 	String cid, mid;
-	String firstName, lastName, CPR, bankID;
+	String firstName, lastName, CPR, bankIDCustomer, bankIDMerchant;
 	List<String> bankAccounts;
 	SimpleDTUPay dtuPay = new SimpleDTUPay();
 	boolean successful;
@@ -51,14 +51,14 @@ public class SimpleDTUPaySteps {
 		}
 	}
 	
-	@Given("a customer with a bank account with balance {int}")
-	public void aCustomerWithABankAccountWithBalance(int int1) {
+	@Given("a customer with a bank account with balance {bigdecimal}")
+	public void aCustomerWithABankAccountWithBalance(BigDecimal bigDecimal) {
 	    firstName = "Frank";
 	    lastName = "Hansen";
 	    CPR = "090701-7617";
 	    try {
-	    	bankID = dtuPay.bank.createAccountWithBalance(createUser(CPR,firstName,lastName), BigDecimal.valueOf(int1));
-			bankAccounts.add(bankID);
+			bankIDCustomer = dtuPay.bank.createAccountWithBalance(createUser(CPR,firstName,lastName), bigDecimal);
+			bankAccounts.add(bankIDCustomer);
 		} catch (BankServiceException_Exception e) {
 			e.printStackTrace();
 		}
@@ -67,7 +67,7 @@ public class SimpleDTUPaySteps {
 	@When("the customer registers with DTU Pay")
 	public void theCustomerRegistersWithDTUPay() {
 		try {
-			cid = dtuPay.registerCustomer(bankID);
+			cid = dtuPay.registerCustomer(bankIDCustomer);
 		} catch (Exception e){
 			this.e = e;
 		}
@@ -80,17 +80,17 @@ public class SimpleDTUPaySteps {
 
 	@Given("a customer with no bank account")
 	public void aCustomerWithNoBankAccount() {
-	    bankID = "invalidId";
+		bankIDCustomer = "invalidId";
 	}
 
-	@Given("a merchant with a bank account with balance {int}")
-	public void aMerchantWithABankAccountWithBalance(Integer int1) {
+	@Given("a merchant with a bank account with balance {bigdecimal}")
+	public void aMerchantWithABankAccountWithBalance(BigDecimal bigDecimal) {
 		firstName = "Benny";
 		lastName = "Bonghoved";
 		CPR = "666666-9999";
 		try {
-			bankID = dtuPay.bank.createAccountWithBalance(createUser(CPR,firstName,lastName), BigDecimal.valueOf(int1));
-			bankAccounts.add(bankID);
+			bankIDMerchant = dtuPay.bank.createAccountWithBalance(createUser(CPR,firstName,lastName), bigDecimal);
+			bankAccounts.add(bankIDMerchant);
 		} catch (BankServiceException_Exception e) {
 			e.printStackTrace();
 		}
@@ -99,7 +99,7 @@ public class SimpleDTUPaySteps {
 	@When("the merchant registers with DTU Pay")
 	public void theMerchantRegistersWithDTUPay() {
 		try {
-			mid = dtuPay.registerMerchants(bankID);
+			mid = dtuPay.registerMerchants(bankIDMerchant);
 		} catch (Exception e){
 			this.e = e;
 		}
@@ -112,32 +112,30 @@ public class SimpleDTUPaySteps {
 
 	@Given("a merchant with no bank account")
 	public void aMerchantWithNoBankAccount() {
-	    bankID = "invalidBankIdMerchant";
+		bankIDMerchant = "invalidBankIdMerchant";
 	}
 	
 	
 	@Given("that the customer is registered with DTU Pay")
-	public void thatTheCustomerIsRegisteredWithDTUPay() {
-	    // Write code here that turns the phrase above into concrete actions
-	    throw new io.cucumber.java.PendingException();
+	public void thatTheCustomerIsRegisteredWithDTUPay() throws Exception {
+	    cid = dtuPay.registerCustomer(bankIDCustomer);
 	}
 
 	@Given("that the merchant is registered with DTU Pay")
-	public void thatTheMerchantIsRegisteredWithDTUPay() {
-	    // Write code here that turns the phrase above into concrete actions
-	    throw new io.cucumber.java.PendingException();
+	public void thatTheMerchantIsRegisteredWithDTUPay() throws Exception {
+	    mid = dtuPay.registerMerchants(bankIDMerchant);
 	}
 
-	@Then("the balance of the customer at the bank is {int} kr")
-	public void theBalanceOfTheCustomerAtTheBankIsKr(Integer int1) {
-	    // Write code here that turns the phrase above into concrete actions
-	    throw new io.cucumber.java.PendingException();
+	@Then("the balance of the customer at the bank is {bigdecimal} kr")
+	public void theBalanceOfTheCustomerAtTheBankIsKr(BigDecimal bigDecimal) throws BankServiceException_Exception {
+	    BigDecimal balanceC = dtuPay.bank.getAccount(bankIDCustomer).getBalance();
+		assertEquals(bigDecimal,balanceC);
 	}
 
-	@Then("the balance of the merchant at the bank is {int} kr")
-	public void theBalanceOfTheMerchantAtTheBankIsKr(Integer int1) {
-	    // Write code here that turns the phrase above into concrete actions
-	    throw new io.cucumber.java.PendingException();
+	@Then("the balance of the merchant at the bank is {bigdecimal} kr")
+	public void theBalanceOfTheMerchantAtTheBankIsKr(BigDecimal bigDecimal) throws BankServiceException_Exception {
+		BigDecimal balanceM = dtuPay.bank.getAccount(bankIDMerchant).getBalance();
+		assertEquals(bigDecimal,balanceM);
 	}
 
 	
@@ -149,8 +147,8 @@ public class SimpleDTUPaySteps {
 	public void aMerchantWithId(String mid) {
 	this.mid = mid;
 	}
-	@When("the merchant initiates a payment for {int} kr by the customer")
-	public void theMerchantInitiatesAPaymentForKrByTheCustomer(int amount) {
+	@When("the merchant initiates a payment for {bigdecimal} kr by the customer")
+	public void theMerchantInitiatesAPaymentForKrByTheCustomer(BigDecimal amount) {
 		try{
 			successful = dtuPay.pay(amount,cid,mid);
 		}catch (Exception e) {this.e = e;}
@@ -161,12 +159,12 @@ public class SimpleDTUPaySteps {
 		assertTrue(successful);
 	}
 	
-	@Given("a successful payment of {int} kr from customer {string} to merchant {string}")
-	public void aSuccessfulPaymentOfKrFromCustomerToMerchant(Integer int1, String string, String string2) {
+	@Given("a successful payment of {bigdecimal} kr from customer {string} to merchant {string}")
+	public void aSuccessfulPaymentOfKrFromCustomerToMerchant(BigDecimal bigDecimal, String string, String string2) {
 	    this.cid = string;
 	    this.mid = string2;
 	    try {
-			successful = dtuPay.pay(int1, cid, mid);
+			successful = dtuPay.pay(bigDecimal, cid, mid);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -177,9 +175,9 @@ public class SimpleDTUPaySteps {
 	    payments = dtuPay.getPayments();
 	}
 
-	@Then("the list contains a payments where customer {string} paid {int} kr to merchant {string}")
-	public void theListContainsAPaymentsWhereCustomerPaidKrToMerchant(String string, int int1, String string2) {
-	    Payment p = new Payment(string, string2, int1);
+	@Then("the list contains a payments where customer {string} paid {bigdecimal} kr to merchant {string}")
+	public void theListContainsAPaymentsWhereCustomerPaidKrToMerchant(String string, BigDecimal bigDecimal, String string2) {
+	    Payment p = new Payment(string, string2, bigDecimal);
 	    assertTrue(payments.get(payments.size()-1).equals(p));
 	}
 
