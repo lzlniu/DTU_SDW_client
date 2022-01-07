@@ -9,7 +9,7 @@ Scenario: Create customer with no Bank account
 	When the customer registers with DTU Pay
 	Then an error message is returned saying "must have a bank account to register"	
 
-Scenario: Successfully merchant customer
+Scenario: Successfully create merchant
 	Given a merchant with a bank account with balance 500
 	When the merchant registers with DTU Pay
 	Then that merchant is registered with DTU Pay
@@ -27,7 +27,7 @@ Given a merchant with a bank account with balance 2000
 And that the merchant is registered with DTU Pay
 When the merchant initiates a payment for 100 kr by the customer
 Then the payment is successful
-And the balance of the custoemr at the bank is 900 kr
+And the balance of the customer at the bank is 900 kr
 And the balance of the merchant at the bank is 2100 kr
 
 Scenario: Successful Payment

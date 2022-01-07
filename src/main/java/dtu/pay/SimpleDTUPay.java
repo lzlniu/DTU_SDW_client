@@ -39,13 +39,32 @@ public class SimpleDTUPay {
 		return r.path("payments").request().get(new GenericType<List<Payment>>(){});
 	}
 
-	public String registerCustomer(String bankID) {
-		return r.path("customers").request().post(Entity.entity(bankID, MediaType.APPLICATION_JSON))
-											 .readEntity(String.class);
+	public String registerCustomer(String bankID) throws Exception {
+		Response response = r.path("customers").request().post(Entity.entity(bankID, MediaType.APPLICATION_JSON));
+		if (response.getStatusInfo() == Response.Status.OK){
+			return response.readEntity(String.class);
+
+		} else {
+			throw new Exception(response.readEntity(String.class));
+		}
+	}
+
+	public String registerMerchants(String bankID) throws Exception {
+		Response response = r.path("merchants").request().post(Entity.entity(bankID, MediaType.APPLICATION_JSON));
+		if (response.getStatusInfo() == Response.Status.OK){
+			return response.readEntity(String.class);
+		} else {
+			throw new Exception(response.readEntity(String.class));
+		}
 	}
 
 	public boolean customerIsRegistered(String cid) {
 		List<String> customers = r.path("customers").request().get(new GenericType<List<String>>(){});
+		return customers.contains(cid);
+	}
+
+	public boolean merchantIsRegistered(String cid) {
+		List<String> customers = r.path("merchants").request().get(new GenericType<List<String>>(){});
 		return customers.contains(cid);
 	}
 }

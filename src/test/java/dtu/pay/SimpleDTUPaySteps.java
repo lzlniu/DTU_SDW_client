@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import dtu.ws.fastmoney.AccountInfo;
 import dtu.ws.fastmoney.BankServiceException_Exception;
 import dtu.ws.fastmoney.User;
 import io.cucumber.java.After;
@@ -65,7 +66,11 @@ public class SimpleDTUPaySteps {
 
 	@When("the customer registers with DTU Pay")
 	public void theCustomerRegistersWithDTUPay() {
-	    cid = dtuPay.registerCustomer(bankID);
+		try {
+			cid = dtuPay.registerCustomer(bankID);
+		} catch (Exception e){
+			this.e = e;
+		}
 	}
 
 	@Then("that customer is registered with DTU Pay")
@@ -75,32 +80,39 @@ public class SimpleDTUPaySteps {
 
 	@Given("a customer with no bank account")
 	public void aCustomerWithNoBankAccount() {
-	    // Write code here that turns the phrase above into concrete actions
-	    throw new io.cucumber.java.PendingException();
+	    bankID = "invalidId";
 	}
 
 	@Given("a merchant with a bank account with balance {int}")
 	public void aMerchantWithABankAccountWithBalance(Integer int1) {
-	    // Write code here that turns the phrase above into concrete actions
-	    throw new io.cucumber.java.PendingException();
+		firstName = "Benny";
+		lastName = "Bonghoved";
+		CPR = "666666-9999";
+		try {
+			bankID = dtuPay.bank.createAccountWithBalance(createUser(CPR,firstName,lastName), BigDecimal.valueOf(int1));
+			bankAccounts.add(bankID);
+		} catch (BankServiceException_Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	@When("the merchant registers with DTU Pay")
 	public void theMerchantRegistersWithDTUPay() {
-	    // Write code here that turns the phrase above into concrete actions
-	    throw new io.cucumber.java.PendingException();
+		try {
+			mid = dtuPay.registerMerchants(bankID);
+		} catch (Exception e){
+			this.e = e;
+		}
 	}
 
 	@Then("that merchant is registered with DTU Pay")
 	public void thatMerchantIsRegisteredWithDTUPay() {
-	    // Write code here that turns the phrase above into concrete actions
-	    throw new io.cucumber.java.PendingException();
+		assertTrue(dtuPay.merchantIsRegistered(mid));
 	}
 
 	@Given("a merchant with no bank account")
 	public void aMerchantWithNoBankAccount() {
-	    // Write code here that turns the phrase above into concrete actions
-	    throw new io.cucumber.java.PendingException();
+	    bankID = "invalidBankIdMerchant";
 	}
 	
 	
@@ -116,8 +128,8 @@ public class SimpleDTUPaySteps {
 	    throw new io.cucumber.java.PendingException();
 	}
 
-	@Then("the balance of the custoemr at the bank is {int} kr")
-	public void theBalanceOfTheCustoemrAtTheBankIsKr(Integer int1) {
+	@Then("the balance of the customer at the bank is {int} kr")
+	public void theBalanceOfTheCustomerAtTheBankIsKr(Integer int1) {
 	    // Write code here that turns the phrase above into concrete actions
 	    throw new io.cucumber.java.PendingException();
 	}
@@ -127,10 +139,7 @@ public class SimpleDTUPaySteps {
 	    // Write code here that turns the phrase above into concrete actions
 	    throw new io.cucumber.java.PendingException();
 	}
-	
-	
-	
-	
+
 	
 	@Given("a customer with id {string}")
 	public void aCustomerWithId(String cid) {
