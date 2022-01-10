@@ -12,7 +12,6 @@ import java.util.List;
 import dtu.ws.fastmoney.*;
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
-import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -26,6 +25,7 @@ public class SimpleDTUPaySteps {
 	List<Payment> payments;
 	Exception e;
 	BankService bank = new BankServiceService().getBankServicePort();
+	DtuPayUser customer = new DtuPayUser();
 	
 	private User createUser(String CPR, String first, String last) {
 		User user = new User();
@@ -53,12 +53,17 @@ public class SimpleDTUPaySteps {
 	
 	@Given("a customer with a bank account with balance {bigdecimal}")
 	public void aCustomerWithABankAccountWithBalance(BigDecimal bigDecimal) {
-	    firstName = "Frank";
-	    lastName = "Hansen";
-	    CPR = "090701-7617";
+	    customer.setFirstName("Frank");
+		customer.setLastName("Hansen");
+		customer.setCPR("090701-7671");
 	    try {
-			bankIDCustomer = bank.createAccountWithBalance(createUser(CPR,firstName,lastName), bigDecimal);
-			bankAccounts.add(bankIDCustomer);
+			customer.setBankID(bank.createAccountWithBalance(
+					createUser(customer.getCPR(),
+							customer.getFirstName(),
+							customer.getLastName()), bigDecimal));
+
+			bankAccounts.add(customer.getBankID());
+
 		} catch (BankServiceException_Exception e) {
 			e.printStackTrace();
 		}
@@ -67,7 +72,12 @@ public class SimpleDTUPaySteps {
 	@When("the customer registers with DTU Pay")
 	public void theCustomerRegistersWithDTUPay() {
 		try {
-			cid = dtuPay.registerCustomer(bankIDCustomer);
+			cid = dtuPay.registerCustomer(
+					customer.getFirstName(),
+					customer.getLastName(),
+					customer.getBankID(),
+					customer.getCPR());
+
 		} catch (Exception e){
 			this.e = e;
 		}
@@ -99,7 +109,7 @@ public class SimpleDTUPaySteps {
 	@When("the merchant registers with DTU Pay")
 	public void theMerchantRegistersWithDTUPay() {
 		try {
-			mid = dtuPay.registerMerchants(bankIDMerchant);
+			mid = dtuPay.registerMerchants(firstName,lastName,bankIDMerchant,CPR);
 		} catch (Exception e){
 			this.e = e;
 		}
@@ -118,17 +128,17 @@ public class SimpleDTUPaySteps {
 	
 	@Given("that the customer is registered with DTU Pay")
 	public void thatTheCustomerIsRegisteredWithDTUPay() throws Exception {
-	    cid = dtuPay.registerCustomer(bankIDCustomer);
+	    cid = dtuPay.registerCustomer(firstName,lastName,customer.getBankID(),CPR);
 	}
 
 	@Given("that the merchant is registered with DTU Pay")
 	public void thatTheMerchantIsRegisteredWithDTUPay() throws Exception {
-	    mid = dtuPay.registerMerchants(bankIDMerchant);
+	    mid = dtuPay.registerMerchants(firstName,lastName,bankIDMerchant,CPR);
 	}
 
 	@Then("the balance of the customer at the bank is {bigdecimal} kr")
 	public void theBalanceOfTheCustomerAtTheBankIsKr(BigDecimal bigDecimal) throws BankServiceException_Exception {
-	    BigDecimal balanceC = bank.getAccount(bankIDCustomer).getBalance();
+	    BigDecimal balanceC = bank.getAccount(customer.getBankID()).getBalance();
 		assertEquals(bigDecimal,balanceC);
 	}
 
@@ -193,8 +203,8 @@ public class SimpleDTUPaySteps {
 
 	@Given("that the customer is deleted from dtu.pay")
 	public void thatTheCustomerIsDeletedFromDtuPay() throws BankServiceException_Exception {
-		bank.retireAccount(bankIDCustomer);
-		bankAccounts.remove(bankIDCustomer);
+		bank.retireAccount(customer.getBankID());
+		bankAccounts.remove(customer.getBankID());
 	}
 
 	@Given("a successful payment of {bigdecimal} kr")

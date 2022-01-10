@@ -47,7 +47,7 @@ Feature: Payment
     And that the merchant is registered with DTU Pay
     When the merchant initiates a payment for 10.0 kr by the customer
     Then the payment is not successful
-    And an error message is returned saying "customer with id customer is unknown"
+    And an error message is returned saying "customer id is unknown"
 
   Scenario: Merchant is not known
     Given a merchant : "merchant" that is not registered with DTU pay
@@ -55,7 +55,7 @@ Feature: Payment
     And that the customer is registered with DTU Pay
     When the merchant initiates a payment for 10.0 kr by the customer
     Then the payment is not successful
-    And an error message is returned saying "merchant with id merchant is unknown"
+    And an error message is returned saying "merchant id is unknown"
 
   Scenario: Deleted Customer interacts with bank
     Given a customer with a bank account with balance 4.20
