@@ -59,6 +59,6 @@ public class merchantAPI {
     }
 
     public List<Payment> getPayments(){
-        return payment.path("payments").request().get(new GenericType<List<Payment>>(){});
+        return report.path("payments").request().get(new GenericType<List<Payment>>(){});
     }
 }

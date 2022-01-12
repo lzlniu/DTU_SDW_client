@@ -48,4 +48,15 @@ public class customerAPI {
 		List<DtuPayUser> customers = account.path("customers").request().get(new GenericType<List<DtuPayUser>>(){});
 		return isUserThere(customers,cid);
 	}
+
+	public List<String> getNewTokens(DtuPayUser customer, int n) throws Exception {
+		Response r = token.path("tokens").request().
+					 post(Entity.entity(customer, MediaType.APPLICATION_JSON));
+		if (r.getStatusInfo() == Response.Status.OK){
+			return r.readEntity(new GenericType<List<String>>(){});
+		} else {
+			throw new Exception(r.readEntity(String.class));
+		}
+	}
+	
 }
