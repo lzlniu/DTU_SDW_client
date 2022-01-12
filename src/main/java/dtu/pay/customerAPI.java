@@ -19,7 +19,7 @@ public class customerAPI {
 	
 	public customerAPI() {
 		c = ClientBuilder.newClient();
-		account = c.target("http://localhost:8080/");
+		account = c.target("http://localhost:8080/accounts/");
 		payment = c.target("http://localhost:8081/");
 		report = c.target("http://localhost:8082/");
 		token = c.target("http://localhost:8083/");
