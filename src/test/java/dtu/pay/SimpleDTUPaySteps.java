@@ -19,7 +19,8 @@ import io.cucumber.java.en.When;
 public class SimpleDTUPaySteps {
 
 	List<String> bankAccounts;
-	SimpleDTUPay dtuPay = new SimpleDTUPay();
+	customerAPI dtuPayCustomer = new customerAPI();
+	merchantAPI dtuPayMerchant = new merchantAPI();
 	boolean successful;
 	List<Payment> payments;
 	Exception e;
@@ -72,7 +73,7 @@ public class SimpleDTUPaySteps {
 	@When("the customer registers with DTU Pay")
 	public void theCustomerRegistersWithDTUPay() {
 		try {
-			customer.setDtuPayID(dtuPay.registerCustomer(
+			customer.setDtuPayID(dtuPayCustomer.registerCustomer(
 					customer.getFirstName(),
 					customer.getLastName(),
 					customer.getBankID(),
@@ -85,7 +86,7 @@ public class SimpleDTUPaySteps {
 
 	@Then("that customer is registered with DTU Pay")
 	public void thatCustomerIsRegisteredWithDTUPay() {
-	    assertTrue(dtuPay.customerIsRegistered(customer.getDtuPayID()));
+	    assertTrue(dtuPayCustomer.customerIsRegistered(customer.getDtuPayID()));
 	}
 
 	@Given("a customer with no bank account")
@@ -114,7 +115,7 @@ public class SimpleDTUPaySteps {
 	@When("the merchant registers with DTU Pay")
 	public void theMerchantRegistersWithDTUPay() {
 		try {
-			merchant.setDtuPayID(dtuPay.registerMerchants(
+			merchant.setDtuPayID(dtuPayMerchant.registerMerchants(
 					merchant.getFirstName(),
 					merchant.getLastName(),
 					merchant.getBankID(),
@@ -127,7 +128,7 @@ public class SimpleDTUPaySteps {
 
 	@Then("that merchant is registered with DTU Pay")
 	public void thatMerchantIsRegisteredWithDTUPay() {
-		assertTrue(dtuPay.merchantIsRegistered(merchant.getDtuPayID()));
+		assertTrue(dtuPayMerchant.merchantIsRegistered(merchant.getDtuPayID()));
 	}
 
 	@Given("a merchant with no bank account")
@@ -139,7 +140,7 @@ public class SimpleDTUPaySteps {
 	@Given("that the customer is registered with DTU Pay")
 	public void thatTheCustomerIsRegisteredWithDTUPay() throws Exception {
 		try {
-			customer.setDtuPayID(dtuPay.registerCustomer(
+			customer.setDtuPayID(dtuPayCustomer.registerCustomer(
 					customer.getFirstName(),
 					customer.getLastName(),
 					customer.getBankID(),
@@ -153,7 +154,7 @@ public class SimpleDTUPaySteps {
 	@Given("that the merchant is registered with DTU Pay")
 	public void thatTheMerchantIsRegisteredWithDTUPay() throws Exception {
 		try {
-			merchant.setDtuPayID(dtuPay.registerMerchants(
+			merchant.setDtuPayID(dtuPayMerchant.registerMerchants(
 					merchant.getFirstName(),
 					merchant.getLastName(),
 					merchant.getBankID(),
@@ -188,7 +189,7 @@ public class SimpleDTUPaySteps {
 	@When("the merchant initiates a payment for {bigdecimal} kr by the customer")
 	public void theMerchantInitiatesAPaymentForKrByTheCustomer(BigDecimal amount) {
 		try{
-			successful = dtuPay.pay(amount,customer.getDtuPayID(),merchant.getDtuPayID());
+			successful = dtuPayMerchant.pay(amount,customer.getDtuPayID(),merchant.getDtuPayID());
 		}catch (Exception e) {this.e = e;}
 	}
 	
@@ -202,7 +203,7 @@ public class SimpleDTUPaySteps {
 		this.customer.setDtuPayID(string);
 	    this.merchant.setDtuPayID(string2);
 	    try {
-			successful = dtuPay.pay(bigDecimal, customer.getDtuPayID(), merchant.getDtuPayID());
+			successful = dtuPayMerchant.pay(bigDecimal, customer.getDtuPayID(), merchant.getDtuPayID());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -210,7 +211,7 @@ public class SimpleDTUPaySteps {
 
 	@When("the manager asks for a list of payments")
 	public void theManagerAsksForAListOfPayments() {
-	    payments = dtuPay.getPayments();
+	    payments = dtuPayMerchant.getPayments();
 	}
 
 
@@ -232,7 +233,7 @@ public class SimpleDTUPaySteps {
 
 	@Given("a successful payment of {bigdecimal} kr")
 	public void aSuccessfulPaymentOfKr(BigDecimal amount) throws Exception {
-		successful = dtuPay.pay(amount, customer.getDtuPayID(), merchant.getDtuPayID());
+		successful = dtuPayMerchant.pay(amount, customer.getDtuPayID(), merchant.getDtuPayID());
 	}
 
 	@Then("the list contains a payments where customer paid {bigdecimal} kr")
