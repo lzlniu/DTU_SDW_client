@@ -56,9 +56,9 @@ public class SimpleDTUPaySteps {
 	
 	@Given("a customer with a bank account with balance {bigdecimal}")
 	public void aCustomerWithABankAccountWithBalance(BigDecimal bigDecimal) {
-	    customer.setFirstName("Frank");
+	    customer.setFirstName("Frankie");
 		customer.setLastName("Hansen");
-		customer.setCPR("090701-7671");
+		customer.setCPR("090701-7672");
 	    try {
 			customer.setBankID(bank.createAccountWithBalance(
 					createUser(customer.getCPR(),

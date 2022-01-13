@@ -50,11 +50,12 @@ public class customerAPI {
 	}
 
 	public List<String> getNewTokens(DtuPayUser customer, int n) throws Exception {
-		Response r = token.path("tokens").request().
-					 post(Entity.entity(customer, MediaType.APPLICATION_JSON));
+		Response r = token.path("tokens").path(String.valueOf(n)).request()
+				.post(Entity.entity(customer, MediaType.APPLICATION_JSON));
 		if (r.getStatusInfo() == Response.Status.OK){
 			return r.readEntity(new GenericType<List<String>>(){});
 		} else {
+			System.out.println("Response status: " + r.getStatus());
 			throw new Exception(r.readEntity(String.class));
 		}
 	}

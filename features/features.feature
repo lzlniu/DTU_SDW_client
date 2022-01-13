@@ -20,8 +20,8 @@ Feature: Payment
     When the merchant registers with DTU Pay
     Then an error message is returned saying "must have a bank account to register"
 
-  Scenario: Generate 5 tokens for new customer
+  Scenario: Generate 4 tokens for new customer
     Given a customer with a bank account with balance 500.0
     And that the customer is registered with DTU Pay
-    When the customer requests to generate 5 tokens
-    Then 5 unique tokens is returned
+    When the customer requests to generate 4 tokens
+    Then 4 unique tokens is returned
