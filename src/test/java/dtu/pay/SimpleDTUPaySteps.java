@@ -27,6 +27,8 @@ public class SimpleDTUPaySteps {
 	BankService bank = new BankServiceService().getBankServicePort();
 	DtuPayUser customer = new DtuPayUser();
 	DtuPayUser merchant = new DtuPayUser();
+
+	List<String> customerTokens = new ArrayList<>();
 	
 	private User createUser(String CPR, String first, String last) {
 		User user = new User();
@@ -256,6 +258,22 @@ public class SimpleDTUPaySteps {
 	public void thatTheMerchantIsDeletedFromDtuPay() throws BankServiceException_Exception {
 		bank.retireAccount(merchant.getBankID());
 		bankAccounts.remove(merchant.getBankID());
+	}
+
+	@When("the customer requests to generate {int} tokens")
+	public void theCustomerRequestsToGenerateTokens(int arg0) {
+		try {
+			customerTokens = dtuPayCustomer.getNewTokens(customer, arg0);
+		} catch (Exception ex) {
+			this.e = ex;
+			System.out.println(e.getMessage());
+			ex.printStackTrace();
+		}
+	}
+
+	@Then("{int} unique tokens is returned")
+	public void uniqueTokensIsReturned(int arg0) {
+		assertEquals(arg0, customerTokens.size());
 	}
 }
 
