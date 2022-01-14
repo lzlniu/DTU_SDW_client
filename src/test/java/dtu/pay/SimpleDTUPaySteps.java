@@ -6,6 +6,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
 
 import java.math.BigDecimal;
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -266,8 +267,6 @@ public class SimpleDTUPaySteps {
 			customerTokens = dtuPayCustomer.getNewTokens(customer, arg0);
 		} catch (Exception ex) {
 			this.e = ex;
-			System.out.println(e.getMessage());
-			ex.printStackTrace();
 		}
 	}
 
@@ -275,5 +274,31 @@ public class SimpleDTUPaySteps {
 	public void uniqueTokensIsReturned(int arg0) {
 		assertEquals(arg0, customerTokens.size());
 	}
+
+	@Given("the customer generates {int} tokens")
+	public void theCustomerGeneratesTokens(int amount) {
+		try {
+			customerTokens = dtuPayCustomer.getNewTokens(customer, amount);
+			assertEquals(amount, customerTokens.size());
+		} catch (Exception ex) {
+			this.e = ex;
+		}
+	}
+
+
+
+	//For finding bank accounts and potentially deleting them
+	@When("searching")
+	public void searching() throws BankServiceException_Exception {
+		//bank.retireAccount("ee111e98-9cb8-4062-bdf8-bf8f10abb7e4");
+		List<AccountInfo> as = bank.getAccounts();
+		for (AccountInfo a : as){
+			System.out.print(a.getUser().getFirstName());
+			System.out.print(" - " + a.getUser().getLastName());
+			System.out.println(" -- " + a.getAccountId());
+		}
+	}
+
+
 }
 

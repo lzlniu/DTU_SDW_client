@@ -29,7 +29,6 @@ public class customerAPI {
 		Response response = account.path("customers").request().post(Entity.entity(new DtuPayUser(firstName,lastName,null,bankID,CPR), MediaType.APPLICATION_JSON));
 		if (response.getStatusInfo() == Response.Status.OK){
 			return response.readEntity(String.class);
-
 		} else {
 			throw new Exception(response.readEntity(String.class));
 		}
