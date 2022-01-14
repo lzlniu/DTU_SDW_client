@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor // Needed for JSON deserialization and XML serialization and deserialization
 @AllArgsConstructor
 public class Payment {
-	private String customer;
-	private String merchant;
+	private String customerToken;
+	private String merchantID;
 	private BigDecimal amount;
 }
