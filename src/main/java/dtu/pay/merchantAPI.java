@@ -47,8 +47,8 @@ public class merchantAPI {
         return false;
     }
 
-    public boolean pay(BigDecimal amount, String cid, String mid) throws Exception {
-        Payment p = new Payment(cid, mid, amount);
+    public boolean pay(BigDecimal amount, String customerToken, String mid) throws Exception {
+        Payment p = new Payment(customerToken, mid, amount);
         Response response = payment.path("payments").request().
                 post(Entity.entity(p, MediaType.APPLICATION_JSON));
         if (response.getStatusInfo() == Response.Status.OK) {

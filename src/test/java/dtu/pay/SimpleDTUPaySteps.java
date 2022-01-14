@@ -28,6 +28,7 @@ public class SimpleDTUPaySteps {
 	DtuPayUser customer = new DtuPayUser();
 	DtuPayUser merchant = new DtuPayUser();
 
+
 	List<String> customerTokens = new ArrayList<>();
 	
 	private User createUser(String CPR, String first, String last) {
@@ -191,7 +192,7 @@ public class SimpleDTUPaySteps {
 	@When("the merchant initiates a payment for {bigdecimal} kr by the customer")
 	public void theMerchantInitiatesAPaymentForKrByTheCustomer(BigDecimal amount) {
 		try{
-			successful = dtuPayMerchant.pay(amount,customer.getDtuPayID(),merchant.getDtuPayID());
+			successful = dtuPayMerchant.pay(amount,customerTokens.get(0),merchant.getDtuPayID());
 		}catch (Exception e) {this.e = e;}
 	}
 	
@@ -274,6 +275,13 @@ public class SimpleDTUPaySteps {
 	@Then("{int} unique tokens is returned")
 	public void uniqueTokensIsReturned(int arg0) {
 		assertEquals(arg0, customerTokens.size());
+	}
+
+	@Given("customer has tokens")
+	public void customerHasTokens() throws Exception {
+		customerTokens = dtuPayCustomer.getNewTokens(customer, 5);
+		System.out.println(customerTokens.toString());
+		assertTrue(!customerTokens.isEmpty());
 	}
 }
 
