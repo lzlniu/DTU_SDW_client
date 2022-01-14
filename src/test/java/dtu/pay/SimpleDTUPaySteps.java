@@ -6,7 +6,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
 
 import java.math.BigDecimal;
-import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -192,7 +191,7 @@ public class SimpleDTUPaySteps {
 	@When("the merchant initiates a payment for {bigdecimal} kr by the customer")
 	public void theMerchantInitiatesAPaymentForKrByTheCustomer(BigDecimal amount) {
 		try{
-			successful = dtuPayMerchant.pay(amount,customer.getDtuPayID(),merchant.getDtuPayID());
+			successful = dtuPayMerchant.pay(amount,customerTokens.get(0),merchant.getDtuPayID());
 		}catch (Exception e) {this.e = e;}
 	}
 	
@@ -285,6 +284,12 @@ public class SimpleDTUPaySteps {
 		}
 	}
 
+	@Given("customer has tokens")
+	public void customerHasTokens() throws Exception {
+		customerTokens = dtuPayCustomer.getNewTokens(customer, 5);
+		System.out.println(customerTokens.toString());
+		assertTrue(!customerTokens.isEmpty());
+	}
 
 
 	//For finding bank accounts and potentially deleting them
@@ -298,7 +303,5 @@ public class SimpleDTUPaySteps {
 			System.out.println(" -- " + a.getAccountId());
 		}
 	}
-
-
 }
 
