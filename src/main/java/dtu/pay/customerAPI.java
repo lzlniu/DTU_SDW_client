@@ -58,5 +58,10 @@ public class customerAPI {
 			throw new Exception(r.readEntity(String.class));
 		}
 	}
-	
+
+	public List<Payment> getReport(String customerID) {
+		List<Payment> payments = report.path("reports/customers").path(customerID).
+				                        request().get(new GenericType<List<Payment>>(){});
+		return payments;
+	}
 }

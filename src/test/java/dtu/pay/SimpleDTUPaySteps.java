@@ -7,6 +7,7 @@ import static org.junit.Assert.assertThrows;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import dtu.ws.fastmoney.*;
@@ -16,25 +17,21 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Response;
-
 public class SimpleDTUPaySteps {
 
 	List<String> bankAccounts;
 	customerAPI dtuPayCustomer = new customerAPI();
 	merchantAPI dtuPayMerchant = new merchantAPI();
 	boolean successful;
-	List<Payment> payments;
+	List<Payment> payments, report;
 	Exception e;
 	BankService bank = new BankServiceService().getBankServicePort();
 	DtuPayUser customer = new DtuPayUser();
 	DtuPayUser merchant = new DtuPayUser();
 
 	List<String> customerTokens = new ArrayList<>();
-	
+	HashMap<String, List<Payment>> customersPayments;
+
 	private User createUser(String CPR, String first, String last) {
 		User user = new User();
 		user.setCprNumber(CPR);
@@ -46,6 +43,9 @@ public class SimpleDTUPaySteps {
 	@Before
 	public void createBlankListOfCreatedAccounts() {
 		bankAccounts = new ArrayList<String>();
+		this.payments = new ArrayList<>();
+		this.report = new ArrayList<>();
+		this.customersPayments = new HashMap<>();
 	}
 
 	@After
@@ -71,6 +71,46 @@ public class SimpleDTUPaySteps {
 							customer.getLastName()), bigDecimal));
 
 			bankAccounts.add(customer.getBankID());
+
+		} catch (BankServiceException_Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Given("a customer with name {string} {string} and CPR {string} and a bank account with balance {bigdecimal}")
+	public void aCustomerWithNameAndCPRAndABankAccountWithBalance(String arg0, String arg1, String arg2, BigDecimal balance) {
+		customer = new DtuPayUser();
+		customer.setFirstName(arg0);
+		customer.setLastName(arg1);
+		customer.setCPR(arg2);
+		try {
+			customer.setBankID(bank.createAccountWithBalance(
+					createUser(customer.getCPR(),
+							customer.getFirstName(),
+							customer.getLastName()),
+							balance));
+
+			bankAccounts.add(customer.getBankID());
+
+		} catch (BankServiceException_Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Given("a merchant with name {string} {string} and CPR {string} and a bank account with balance {bigdecimal}")
+	public void aMerchantWithNameAndCPRAndABankAccountWithBalance(String arg0, String arg1, String arg2, BigDecimal balance) {
+		merchant = new DtuPayUser();
+		merchant.setFirstName(arg0);
+		merchant.setLastName(arg1);
+		merchant.setCPR(arg2);
+		try {
+			merchant.setBankID(bank.createAccountWithBalance(
+					createUser(merchant.getCPR(),
+							merchant.getFirstName(),
+							merchant.getLastName()),
+							balance));
+
+			bankAccounts.add(merchant.getBankID());
 
 		} catch (BankServiceException_Exception e) {
 			e.printStackTrace();
@@ -197,6 +237,11 @@ public class SimpleDTUPaySteps {
 	public void theMerchantInitiatesAPaymentForKrByTheCustomer(BigDecimal amount) {
 		try{
 			successful = dtuPayMerchant.pay(amount,customerTokens.get(0),merchant.getDtuPayID());
+
+			Payment p = new Payment(customerTokens.get(0), merchant.getDtuPayID(), amount);
+			if (!customersPayments.containsKey(customer.getDtuPayID())) customersPayments.put(customer.getDtuPayID(),new ArrayList<>());
+			customersPayments.get(customer.getDtuPayID()).add(p);
+			payments.add(p);
 		}catch (Exception e) {
 			successful = false;
 			this.e = e;
@@ -207,6 +252,11 @@ public class SimpleDTUPaySteps {
 	public void theMerchantInitiatesASecondPaymentForKrByTheCustomer(BigDecimal amount) {
 		try{
 			successful = dtuPayMerchant.pay(amount,customerTokens.get(1),merchant.getDtuPayID());
+
+			Payment p = new Payment(customerTokens.get(1), merchant.getDtuPayID(), amount);
+			if (!customersPayments.containsKey(customer.getDtuPayID())) customersPayments.put(customer.getDtuPayID(),new ArrayList<>());
+			customersPayments.get(customer.getDtuPayID()).add(p);
+			payments.add(p);
 		}catch (Exception e) {
 			successful = false;
 			this.e = e;
@@ -224,6 +274,7 @@ public class SimpleDTUPaySteps {
 	    this.merchant.setDtuPayID(string2);
 	    try {
 			successful = dtuPayMerchant.pay(bigDecimal, customer.getDtuPayID(), merchant.getDtuPayID());
+			payments.add(new Payment(customer.getDtuPayID(), merchant.getDtuPayID(), bigDecimal));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -231,7 +282,7 @@ public class SimpleDTUPaySteps {
 
 	@When("the manager asks for a list of payments")
 	public void theManagerAsksForAListOfPayments() {
-	    payments = dtuPayMerchant.getPayments();
+	    report = dtuPayMerchant.getSuperReport("managerPSW");
 	}
 
 
@@ -254,6 +305,7 @@ public class SimpleDTUPaySteps {
 	@Given("a successful payment of {bigdecimal} kr")
 	public void aSuccessfulPaymentOfKr(BigDecimal amount) throws Exception {
 		successful = dtuPayMerchant.pay(amount, customer.getDtuPayID(), merchant.getDtuPayID());
+		payments.add(new Payment(customer.getDtuPayID(), merchant.getDtuPayID(), amount));
 	}
 
 	@Then("the list contains a payments where customer paid {bigdecimal} kr")
@@ -305,7 +357,6 @@ public class SimpleDTUPaySteps {
 	@Given("customer has tokens")
 	public void customerHasTokens() throws Exception {
 		customerTokens = dtuPayCustomer.getNewTokens(customer, 5);
-		System.out.println(customerTokens.toString());
 		assertTrue(!customerTokens.isEmpty());
 	}
 
@@ -313,6 +364,14 @@ public class SimpleDTUPaySteps {
 	public void customerHasNoTokens() {
 		customerTokens = new ArrayList<>();
 		customerTokens.add("invalid token");
+	}
+
+	@Then("The report contains every payment made")
+	public void theReportContainsEveryPaymentMade() {
+		System.out.println(report);
+		for (Payment p : payments){
+			assertTrue(report.contains(p));
+		}
 	}
 
 
@@ -328,6 +387,48 @@ public class SimpleDTUPaySteps {
 		}
 	}
 
+
+	@When("the manager asks for a report")
+	public void theManagerAsksForAReport() {
+		report = dtuPayMerchant.getSuperReport("managerPSW");
+	}
+
+	@When("the customer asks for a report")
+	public void theCustomerAsksForAReport() {
+		report = dtuPayCustomer.getReport(customer.getDtuPayID());
+	}
+
+	@When("the merchant asks for a report")
+	public void theMerchantAsksForAReport() {
+		report = dtuPayMerchant.getReport(merchant.getDtuPayID());
+	}
+
+
+	@Then("the report contains only payments with that merchant")
+	public void theReportContainsOnlyPaymentsWithThatMerchant() {
+		System.out.println(report);
+		for (Payment p : report){  //check that all payments in report belong to current customer
+			assertTrue(payments.contains(p));
+			assertEquals(merchant.getDtuPayID(), p.getMerchantID());
+		}
+		for (Payment p : payments){
+			if (p.getMerchantID().equals(merchant.getDtuPayID())){
+				assertTrue(report.contains(p));
+			}
+		}
+	}
+
+	@Then("the report contains only payments with that customer")
+	public void theReportContainsOnlyPaymentsWithThatCustomer() {
+		System.out.println(report);
+		for (Payment p : report){  //check that all payments in report belong to current customer
+			assertTrue(payments.contains(p));
+			assertTrue(customerTokens.contains(p.getCustomerToken()));
+		}
+		for (Payment p : customersPayments.get(customer.getDtuPayID())){ //check that all our payments are included in report
+			assertTrue(report.contains(p));
+		}
+	}
 
 
 }

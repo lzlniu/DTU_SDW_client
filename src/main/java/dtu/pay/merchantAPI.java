@@ -58,7 +58,20 @@ public class merchantAPI {
         }
     }
 
-    public List<Payment> getPayments(){
-        return report.path("payments").request().get(new GenericType<List<Payment>>(){});
+    public List<Payment> getSuperReport(String password){
+        System.out.printf("ss");
+        if (password.equals("managerPSW")) { //emulates authenticating manager
+            System.out.println("heu");
+            return report.path("reports").request().get(new GenericType<List<Payment>>() {
+            });
+        }else{
+            return null;
+        }
+    }
+
+    public List<Payment> getReport(String merchantID) {
+        List<Payment> payments = report.path("reports/merchants").path(merchantID).
+                request().get(new GenericType<List<Payment>>(){});
+        return payments;
     }
 }
