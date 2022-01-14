@@ -16,6 +16,11 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Response;
+
 public class SimpleDTUPaySteps {
 
 	List<String> bankAccounts;
@@ -42,7 +47,7 @@ public class SimpleDTUPaySteps {
 	public void createBlankListOfCreatedAccounts() {
 		bankAccounts = new ArrayList<String>();
 	}
-	
+
 	@After
 	public void deleteCreatedBankAccounts() {
 		for (String account : bankAccounts) {
@@ -192,7 +197,20 @@ public class SimpleDTUPaySteps {
 	public void theMerchantInitiatesAPaymentForKrByTheCustomer(BigDecimal amount) {
 		try{
 			successful = dtuPayMerchant.pay(amount,customerTokens.get(0),merchant.getDtuPayID());
-		}catch (Exception e) {this.e = e;}
+		}catch (Exception e) {
+			successful = false;
+			this.e = e;
+		}
+	}
+
+	@When("the merchant initiates a second payment for {bigdecimal} kr by the customer")
+	public void theMerchantInitiatesASecondPaymentForKrByTheCustomer(BigDecimal amount) {
+		try{
+			successful = dtuPayMerchant.pay(amount,customerTokens.get(1),merchant.getDtuPayID());
+		}catch (Exception e) {
+			successful = false;
+			this.e = e;
+		}
 	}
 	
 	@Then("the payment is successful")
@@ -291,6 +309,12 @@ public class SimpleDTUPaySteps {
 		assertTrue(!customerTokens.isEmpty());
 	}
 
+	@Given("customer has no tokens")
+	public void customerHasNoTokens() {
+		customerTokens = new ArrayList<>();
+		customerTokens.add("invalid token");
+	}
+
 
 	//For finding bank accounts and potentially deleting them
 	@When("searching")
@@ -303,5 +327,8 @@ public class SimpleDTUPaySteps {
 			System.out.println(" -- " + a.getAccountId());
 		}
 	}
+
+
+
 }
 
