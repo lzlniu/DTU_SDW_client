@@ -18,10 +18,10 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
 public class DTUPaySteps {
-
+	final boolean runningLocally = false;
 	List<String> bankAccounts;
-	customerAPI dtuPayCustomer = new customerAPI();
-	merchantAPI dtuPayMerchant = new merchantAPI();
+	customerAPI dtuPayCustomer = new customerAPI(runningLocally);
+	merchantAPI dtuPayMerchant = new merchantAPI(runningLocally);
 	boolean successful;
 	List<Payment> payments, report;
 	Exception e;

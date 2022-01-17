@@ -17,12 +17,14 @@ public class customerAPI {
 	
 
 	
-	public customerAPI() {
+	public customerAPI(boolean runningLocally) {
 		c = ClientBuilder.newClient();
-		account = c.target("http://localhost:8080/accounts/");
-		payment = c.target("http://localhost:8081/");
-		report = c.target("http://localhost:8082/");
-		token = c.target("http://localhost:8083/");
+		String serverHost = "";
+		if (runningLocally) serverHost = "http://localhost"; else serverHost = "http://fm-20.compute.dtu.dk";
+		account = c.target(serverHost + ":8080/accounts/");
+		payment = c.target(serverHost + ":8081/");
+		report = c.target(serverHost + ":8082/");
+		token = c.target(serverHost + ":8083/");
 	}
 
 	public String registerCustomer(String firstName, String lastName, String bankID, String CPR) throws Exception {
