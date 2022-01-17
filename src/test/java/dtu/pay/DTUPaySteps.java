@@ -17,7 +17,7 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
-public class SimpleDTUPaySteps {
+public class DTUPaySteps {
 
 	List<String> bankAccounts;
 	customerAPI dtuPayCustomer = new customerAPI();
