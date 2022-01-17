@@ -19,7 +19,7 @@ public class merchantAPI {
     public merchantAPI(boolean runningLocally) {
         c = ClientBuilder.newClient();
         String serverHost = "";
-        if (runningLocally) serverHost = "http://localhost"; else serverHost = "http://fm-20.compute.dtu.dk";
+        serverHost = runningLocally ? "http://localhost" : "http://fm-20.compute.dtu.dk";
         account = c.target(serverHost + ":8080/accounts/");
         payment = c.target(serverHost + ":8081/");
         report = c.target(serverHost + ":8082/");
