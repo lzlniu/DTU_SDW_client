@@ -32,6 +32,7 @@ public class DTUPaySteps {
 	List<String> customerTokens = new ArrayList<>();
 	HashMap<String, List<Payment>> customersPayments;
 
+	//@author s164422 - Thomas Bergen
 	private User createUser(String CPR, String first, String last) {
 		User user = new User();
 		user.setCprNumber(CPR);
@@ -39,7 +40,8 @@ public class DTUPaySteps {
 		user.setLastName(last);
 		return user;
 	}
-	
+
+	//@author s174293 - Kasper Jørgensen
 	@Before
 	public void createBlankListOfCreatedAccounts() {
 		bankAccounts = new ArrayList<String>();
@@ -48,6 +50,7 @@ public class DTUPaySteps {
 		this.customersPayments = new HashMap<>();
 	}
 
+	//@author s202772 - Gustav Kinch
 	@After
 	public void deleteCreatedBankAccounts() {
 		for (String account : bankAccounts) {
@@ -58,7 +61,7 @@ public class DTUPaySteps {
 			}
 		}
 	}
-	
+	//@author s215949 - Zelin Li
 	@Given("a customer with a bank account with balance {bigdecimal}")
 	public void aCustomerWithABankAccountWithBalance(BigDecimal bigDecimal) {
 	    customer.setFirstName("Frankie");
@@ -76,7 +79,7 @@ public class DTUPaySteps {
 			e.printStackTrace();
 		}
 	}
-
+	//@author s213578 - Johannes Pedersen
 	@Given("a customer with name {string} {string} and CPR {string} and a bank account with balance {bigdecimal}")
 	public void aCustomerWithNameAndCPRAndABankAccountWithBalance(String arg0, String arg1, String arg2, BigDecimal balance) {
 		customer = new DtuPayUser();
@@ -96,7 +99,7 @@ public class DTUPaySteps {
 			e.printStackTrace();
 		}
 	}
-
+	//@author s212643 - Xingguang Geng
 	@Given("a merchant with name {string} {string} and CPR {string} and a bank account with balance {bigdecimal}")
 	public void aMerchantWithNameAndCPRAndABankAccountWithBalance(String arg0, String arg1, String arg2, BigDecimal balance) {
 		merchant = new DtuPayUser();
@@ -116,7 +119,7 @@ public class DTUPaySteps {
 			e.printStackTrace();
 		}
 	}
-
+	//@author s164422 - Thomas Bergen
 	@When("the customer registers with DTU Pay")
 	public void theCustomerRegistersWithDTUPay() {
 		try {
@@ -130,17 +133,18 @@ public class DTUPaySteps {
 			this.e = e;
 		}
 	}
-
+	//@author s174293 - Kasper Jørgensen
 	@Then("that customer is registered with DTU Pay")
 	public void thatCustomerIsRegisteredWithDTUPay() {
 	    assertTrue(dtuPayCustomer.customerIsRegistered(customer.getDtuPayID()));
 	}
-
+	//@author s202772 - Gustav Kinch
 	@Given("a customer with no bank account")
 	public void aCustomerWithNoBankAccount() {
 		customer.setDtuPayID("invalid ID");
 	}
 
+	//@author s215949 - Zelin Li
 	@Given("a merchant with a bank account with balance {bigdecimal}")
 	public void aMerchantWithABankAccountWithBalance(BigDecimal bigDecimal) {
 		merchant.setFirstName("Benny");
@@ -158,7 +162,7 @@ public class DTUPaySteps {
 			e.printStackTrace();
 		}
 	}
-
+	//@author s213578 - Johannes Pedersen
 	@When("the merchant registers with DTU Pay")
 	public void theMerchantRegistersWithDTUPay() {
 		try {
@@ -172,18 +176,18 @@ public class DTUPaySteps {
 			this.e = e;
 		}
 	}
-
+	//@author s212643 - Xingguang Geng
 	@Then("that merchant is registered with DTU Pay")
 	public void thatMerchantIsRegisteredWithDTUPay() {
 		assertTrue(dtuPayMerchant.merchantIsRegistered(merchant.getDtuPayID()));
 	}
-
+	//@author s164422 - Thomas Bergen
 	@Given("a merchant with no bank account")
 	public void aMerchantWithNoBankAccount() {
 		merchant.setBankID("invalidBankIdMerchant");
 	}
 	
-	
+	//@author s174293 - Kasper Jørgensen
 	@Given("that the customer is registered with DTU Pay")
 	public void thatTheCustomerIsRegisteredWithDTUPay() throws Exception {
 		try {
@@ -197,7 +201,7 @@ public class DTUPaySteps {
 			this.e = e;
 		}
 	}
-
+	//@author s202772 - Gustav Kinch
 	@Given("that the merchant is registered with DTU Pay")
 	public void thatTheMerchantIsRegisteredWithDTUPay() throws Exception {
 		try {
@@ -211,28 +215,31 @@ public class DTUPaySteps {
 			this.e = e;
 		}
 	}
-
+	//@author s215949 - Zelin Li
 	@Then("the balance of the customer at the bank is {bigdecimal} kr")
 	public void theBalanceOfTheCustomerAtTheBankIsKr(BigDecimal bigDecimal) throws BankServiceException_Exception {
 	    BigDecimal balanceC = bank.getAccount(customer.getBankID()).getBalance();
 		assertEquals(bigDecimal,balanceC);
 	}
 
+	//@author s212643 - Xingguang Geng
 	@Then("the balance of the merchant at the bank is {bigdecimal} kr")
 	public void theBalanceOfTheMerchantAtTheBankIsKr(BigDecimal bigDecimal) throws BankServiceException_Exception {
 		BigDecimal balanceM = bank.getAccount(merchant.getBankID()).getBalance();
 		assertEquals(bigDecimal,balanceM);
 	}
 
-	
+	//@author s164422 - Thomas Bergen
 	@Given("a customer with id {string}")
 	public void aCustomerWithId(String cid) {
 	this.customer.setDtuPayID(cid);
 	}
+	//@author s174293 - Kasper Jørgensen
 	@Given("a merchant with id {string}")
 	public void aMerchantWithId(String mid) {
 	this.merchant.setDtuPayID(mid);
 	}
+	//@author s202772 - Gustav Kinch
 	@When("the merchant initiates a payment for {bigdecimal} kr by the customer")
 	public void theMerchantInitiatesAPaymentForKrByTheCustomer(BigDecimal amount) {
 		try{
@@ -247,7 +254,7 @@ public class DTUPaySteps {
 			this.e = e;
 		}
 	}
-
+	//@author s215949 - Zelin Li
 	@When("the merchant initiates a second payment for {bigdecimal} kr by the customer")
 	public void theMerchantInitiatesASecondPaymentForKrByTheCustomer(BigDecimal amount) {
 		try{
@@ -262,12 +269,12 @@ public class DTUPaySteps {
 			this.e = e;
 		}
 	}
-	
+	//@author s213578 - Johannes Pedersen
 	@Then("the payment is successful")
 	public void thePaymentIsSuccessful() {
 		assertTrue(successful);
 	}
-	
+	//@author s212643 - Xingguang Geng
 	@Given("a successful payment of {bigdecimal} kr from customer {string} to merchant {string}")
 	public void aSuccessfulPaymentOfKrFromCustomerToMerchant(BigDecimal bigDecimal, String string, String string2) {
 		this.customer.setDtuPayID(string);
@@ -279,57 +286,57 @@ public class DTUPaySteps {
 			e.printStackTrace();
 		}
 	}
-
+	//@author s164422 - Thomas Bergen
 	@When("the manager asks for a list of payments")
 	public void theManagerAsksForAListOfPayments() {
 	    report = dtuPayMerchant.getSuperReport("managerPSW");
 	}
 
-
+	//@author s174293 - Kasper Jørgensen
 	@Then("the payment is not successful")
 	public void thePaymentIsNotSuccessful() {
 	    assertFalse(successful);
 	}
-
+	//@author s202772 - Gustav Kinch
 	@Then("an error message is returned saying {string}")
 	public void anErrorMessageIsReturnedSaying(String string) {
 		assertEquals(string, e.getMessage());
 	}
-
+    //@author s215949 - Zelin Li
 	@Given("that the customer is deleted from dtu.pay")
 	public void thatTheCustomerIsDeletedFromDtuPay() throws BankServiceException_Exception {
 		bank.retireAccount(customer.getBankID());
 		bankAccounts.remove(customer.getBankID());
 	}
-
+	//@author s213578 - Johannes Pedersen
 	@Given("a successful payment of {bigdecimal} kr")
 	public void aSuccessfulPaymentOfKr(BigDecimal amount) throws Exception {
 		successful = dtuPayMerchant.pay(amount, customer.getDtuPayID(), merchant.getDtuPayID());
 		payments.add(new Payment(customer.getDtuPayID(), merchant.getDtuPayID(), amount));
 	}
-
+	//@author s212643 - Xingguang Geng
 	@Then("the list contains a payments where customer paid {bigdecimal} kr")
 	public void theListContainsAPaymentsWhereCustomerPaidKr(BigDecimal amount) {
 		Payment p = new Payment(customer.getDtuPayID(), merchant.getDtuPayID(), amount);
 		assertTrue(payments.get(payments.size()-1).equals(p));
 	}
-
+	//@author s164422 - Thomas Bergen
 	@Given("a customer : {string} that is not registered with DTU pay")
 	public void aCustomerThatIsNotRegisteredWithDTUPay(String arg0) {
 		this.customer.setDtuPayID(arg0);
 	}
-
+	//@author s174293 - Kasper Jørgensen
 	@Given("a merchant : {string} that is not registered with DTU pay")
 	public void aMerchantThatIsNotRegisteredWithDTUPay(String arg0) {
 		this.merchant.setDtuPayID(arg0);
 	}
-
+	//@author s202772 - Gustav Kinch
 	@Given("that the merchant is deleted from dtu.pay")
 	public void thatTheMerchantIsDeletedFromDtuPay() throws BankServiceException_Exception {
 		bank.retireAccount(merchant.getBankID());
 		bankAccounts.remove(merchant.getBankID());
 	}
-
+	//@author s215949 - Zelin Li
 	@When("the customer requests to generate {int} tokens")
 	public void theCustomerRequestsToGenerateTokens(int arg0) {
 		try {
@@ -338,12 +345,12 @@ public class DTUPaySteps {
 			this.e = ex;
 		}
 	}
-
+	//@author s213578 - Johannes Pedersen
 	@Then("{int} unique tokens is returned")
 	public void uniqueTokensIsReturned(int arg0) {
 		assertEquals(arg0, customerTokens.size());
 	}
-
+	//@author s212643 - Xingguang Geng
 	@Given("the customer generates {int} tokens")
 	public void theCustomerGeneratesTokens(int amount) {
 		try {
@@ -353,19 +360,19 @@ public class DTUPaySteps {
 			this.e = ex;
 		}
 	}
-
+	//@author s164422 - Thomas Bergen
 	@Given("customer has tokens")
 	public void customerHasTokens() throws Exception {
 		customerTokens = dtuPayCustomer.getNewTokens(customer, 5);
 		assertTrue(!customerTokens.isEmpty());
 	}
-
+	//@author s174293 - Kasper Jørgensen
 	@Given("customer has no tokens")
 	public void customerHasNoTokens() {
 		customerTokens = new ArrayList<>();
 		customerTokens.add("invalid token");
 	}
-
+	//@author s202772 - Gustav Kinch
 	@Then("The report contains every payment made")
 	public void theReportContainsEveryPaymentMade() {
 		System.out.println(report);
@@ -374,11 +381,10 @@ public class DTUPaySteps {
 		}
 	}
 
-
+	//@author s215949 - Zelin Li
 	//For finding bank accounts and potentially deleting them
 	@When("searching")
 	public void searching() throws BankServiceException_Exception {
-		//bank.retireAccount("ee111e98-9cb8-4062-bdf8-bf8f10abb7e4");
 		List<AccountInfo> as = bank.getAccounts();
 		for (AccountInfo a : as){
 			System.out.print(a.getUser().getFirstName());
@@ -387,23 +393,23 @@ public class DTUPaySteps {
 		}
 	}
 
-
+	//@author s213578 - Johannes Pedersen
 	@When("the manager asks for a report")
 	public void theManagerAsksForAReport() {
 		report = dtuPayMerchant.getSuperReport("managerPSW");
 	}
-
+	//@author s212643 - Xingguang Geng
 	@When("the customer asks for a report")
 	public void theCustomerAsksForAReport() {
 		report = dtuPayCustomer.getReport(customer.getDtuPayID());
 	}
-
+	//@author s164422 - Thomas Bergen
 	@When("the merchant asks for a report")
 	public void theMerchantAsksForAReport() {
 		report = dtuPayMerchant.getReport(merchant.getDtuPayID());
 	}
 
-
+	//@author s174293 - Kasper Jørgensen
 	@Then("the report contains only payments with that merchant")
 	public void theReportContainsOnlyPaymentsWithThatMerchant() {
 		System.out.println(report);
@@ -417,7 +423,7 @@ public class DTUPaySteps {
 			}
 		}
 	}
-
+	//@author s202772 - Gustav Kinch
 	@Then("the report contains only payments with that customer")
 	public void theReportContainsOnlyPaymentsWithThatCustomer() {
 		System.out.println(report);

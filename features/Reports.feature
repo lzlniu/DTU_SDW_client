@@ -1,4 +1,5 @@
 Feature: reports
+  #@author s213578 - Johannes Pedersen
   Background:
     Given a customer with name "cus" "tomer" and CPR "823573-6514" and a bank account with balance 1000.0
     And that the customer is registered with DTU Pay
@@ -22,15 +23,15 @@ Feature: reports
     Then the payment is successful
     And the balance of the customer at the bank is 400.0 kr
     And the balance of the merchant at the bank is 1100.0 kr
-
+  #@author s212643 - Xingguang Geng
   Scenario: getting super report
     When the manager asks for a report
     Then The report contains every payment made
-
+  #@author s164422 - Thomas Bergen
   Scenario: getting Customer report
     When the customer asks for a report
     Then the report contains only payments with that customer
-
+  #@author s174293 - Kasper Jørgensen
    Scenario: getting Merchant report
      When the merchant asks for a report
      Then the report contains only payments with that merchant

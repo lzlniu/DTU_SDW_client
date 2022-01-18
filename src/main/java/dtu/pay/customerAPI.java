@@ -16,7 +16,7 @@ public class customerAPI {
 	WebTarget account, payment, report, token;
 	
 
-	
+	//@author s164422 - Thomas Bergen
 	public customerAPI(boolean runningLocally) {
 		c = ClientBuilder.newClient();
 		String serverHost = "";
@@ -26,7 +26,7 @@ public class customerAPI {
 		report = c.target(serverHost + ":8082/");
 		token = c.target(serverHost + ":8083/");
 	}
-
+	//@author s174293 - Kasper Jørgensen
 	public String registerCustomer(String firstName, String lastName, String bankID, String CPR) throws Exception {
 		Response response = account.path("customers").request().post(Entity.entity(new DtuPayUser(firstName,lastName,null,bankID,CPR), MediaType.APPLICATION_JSON));
 		if (response.getStatusInfo() == Response.Status.OK){
@@ -35,7 +35,7 @@ public class customerAPI {
 			throw new Exception(response.readEntity(String.class));
 		}
 	}
-
+	//@author s202772 - Gustav Kinch
 	public Boolean isUserThere(List<DtuPayUser> list, String id){
 		for (DtuPayUser dtuPayUser : list) {
 			if (dtuPayUser.getDtuPayID().equals(id)){
@@ -44,12 +44,13 @@ public class customerAPI {
 		}
 		return false;
 	}
-
+	//@author s215949 - Zelin Li
 	public boolean customerIsRegistered(String cid) {
 		List<DtuPayUser> customers = account.path("customers").request().get(new GenericType<List<DtuPayUser>>(){});
 		return isUserThere(customers,cid);
 	}
 
+	//@author s213578 - Johannes Pedersen
 	public List<String> getNewTokens(DtuPayUser customer, int n) throws Exception {
 		Response r = token.path("tokens").path(String.valueOf(n)).request()
 				.post(Entity.entity(customer, MediaType.APPLICATION_JSON));
@@ -60,7 +61,7 @@ public class customerAPI {
 			throw new Exception(r.readEntity(String.class));
 		}
 	}
-
+	//@author s212643 - Xingguang Geng
 	public List<Payment> getReport(String customerID) {
 		List<Payment> payments = report.path("reports/customers").path(customerID).
 				                        request().get(new GenericType<List<Payment>>(){});

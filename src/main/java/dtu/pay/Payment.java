@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 @Data // Automatic getter and setters and equals etc
 @NoArgsConstructor // Needed for JSON deserialization and XML serialization and deserialization
 @AllArgsConstructor
+//@author s215949 - Zelin Li
 public class Payment {
 	private String customerToken;
 	private String merchantID;

@@ -9,6 +9,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Data // Automatic getter and setters and equals etc
 @NoArgsConstructor // Needed for JSON deserialization and XML serialization and deserialization
 @AllArgsConstructor
+//@author s212643 - Xingguang Geng
 public class DtuPayUser {
     private String firstName;
     private String lastName;
