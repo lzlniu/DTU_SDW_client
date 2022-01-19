@@ -21,7 +21,7 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
 public class DTUPaySteps {
-	final boolean runningLocally = false;
+	final boolean runningLocally = true;
 	List<String> bankAccounts;
 	customerAPI dtuPayCustomer = new customerAPI(runningLocally);
 	merchantAPI dtuPayMerchant = new merchantAPI(runningLocally);
