@@ -80,7 +80,6 @@ Feature: Payment
     When the merchant initiates a payment for 100.0 kr by the customer
     Then the payment is not successful
     And an error message is returned saying "Creditor account does not exist"
-
   #@author s215949 - Zelin Li
   Scenario: Customer has insufficient funds
     Given a customer with a bank account with balance 100.0
@@ -91,3 +90,23 @@ Feature: Payment
     When the merchant initiates a payment for 100.01 kr by the customer
     Then the payment is not successful
     And an error message is returned saying "Debtor balance will be negative"
+  #@author s213578 - Johannes Pedersen
+  Scenario: Two concurrent payments
+    Given a customer with name "cus" "tomer" and CPR "823573-6514" and a bank account with balance 1000.0
+    And that the customer is registered with DTU Pay
+    Given a merchant with name "Ben" "Gjs" and CPR "383838-1234" and a bank account with balance 2000.0
+    And that the merchant is registered with DTU Pay
+    Given customer has tokens
+    Given a second customer with name "cust" "omer" and CPR "825573-6114" and a bank account with balance 1000.0
+    And that the second customer is registered with DTU Pay
+    Given the second customer has tokens
+    Given a second merchant with name "Benny" "Gjis" and CPR "352838-1524" and a bank account with balance 2000.0
+    And that the second merchant is registered with DTU Pay
+    When the merchant initiates a payment for 100.01 kr by the customer and the second merchant initiates a payment for 372.03 by the second customer
+    Then the payment is successful
+    Then the second payment is successful
+    And the balance of the customer at the bank is 899.99 kr
+    And the balance of the merchant at the bank is 2100.01 kr
+    And the balance of the second customer at the bank is 627.97 kr
+    And the balance of the second merchant at the bank is 2372.03 kr
+
