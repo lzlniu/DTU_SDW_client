@@ -5,7 +5,7 @@ Feature: Payment
     Given a customer with a bank account with balance 500.0
     When the customer registers with DTU Pay
     Then that customer is registered with DTU Pay
-  #@author s174 293 - Kasper Jørgensen
+  #@author s174293 - Kasper Jørgensen
   Scenario: Create customer with no Bank account
     Given a customer with no bank account
     When the customer registers with DTU Pay
@@ -44,3 +44,12 @@ Feature: Payment
     Given a customer : "customer" that is not registered with DTU pay
     When the customer requests to generate 4 tokens
     Then an error message is returned saying "customer is not registered"
+  #@author s202772 - Gustav Kinch
+  Scenario: 2 customers requesting tokens at the same time
+    Given a customer with name "cus" "tomer" and CPR "823573-6514" and a bank account with balance 1000.0
+    And that the customer is registered with DTU Pay
+    Given a second customer with name "custo" "mer" and CPR "853573-6514" and a bank account with balance 1000.0
+    And that the second customer is registered with DTU Pay
+    When both customers requests 3 and 5 tokens respectively
+    Then 3 unique tokens is returned to the first customer
+    And 5 unique tokens is returned to the second customer

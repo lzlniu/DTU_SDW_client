@@ -6,13 +6,16 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
 
 import java.math.BigDecimal;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import dtu.ws.fastmoney.*;
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
+import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -24,12 +27,14 @@ public class DTUPaySteps {
 	merchantAPI dtuPayMerchant = new merchantAPI(runningLocally);
 	boolean successful;
 	List<Payment> payments, report;
-	Exception e;
+	Exception e, e2;
 	BankService bank = new BankServiceService().getBankServicePort();
 	DtuPayUser customer = new DtuPayUser();
+	DtuPayUser customer2 = new DtuPayUser();
 	DtuPayUser merchant = new DtuPayUser();
 
 	List<String> customerTokens = new ArrayList<>();
+	List<String> customer2Tokens = new ArrayList<>();
 	HashMap<String, List<Payment>> customersPayments;
 
 	//@author s164422 - Thomas Bergen
@@ -99,6 +104,29 @@ public class DTUPaySteps {
 			e.printStackTrace();
 		}
 	}
+
+	//@author s215949 - Zelin Li
+	@Given("a second customer with name {string} {string} and CPR {string} and a bank account with balance {bigdecimal}")
+	public void aSecondCustomerWithNameAndCPRAndABankAccountWithBalance(String arg0, String arg1, String arg2, BigDecimal balance) {
+		customer2 = new DtuPayUser();
+		customer2.setFirstName(arg0);
+		customer2.setLastName(arg1);
+		customer2.setCPR(arg2);
+		try {
+			customer2.setBankID(bank.createAccountWithBalance(
+					createUser(customer2.getCPR(),
+							customer2.getFirstName(),
+							customer2.getLastName()),
+					balance));
+
+			bankAccounts.add(customer2.getBankID());
+
+		} catch (BankServiceException_Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+
 	//@author s212643 - Xingguang Geng
 	@Given("a merchant with name {string} {string} and CPR {string} and a bank account with balance {bigdecimal}")
 	public void aMerchantWithNameAndCPRAndABankAccountWithBalance(String arg0, String arg1, String arg2, BigDecimal balance) {
@@ -201,6 +229,21 @@ public class DTUPaySteps {
 			this.e = e;
 		}
 	}
+	//@author s215949 - Zelin Li
+	@And("that the second customer is registered with DTU Pay")
+	public void thatTheSecondCustomerIsRegisteredWithDTUPay() {
+		try {
+			customer2.setDtuPayID(dtuPayCustomer.registerCustomer(
+					customer2.getFirstName(),
+					customer2.getLastName(),
+					customer2.getBankID(),
+					customer2.getCPR()));
+
+		} catch (Exception e){
+			this.e = e;
+		}
+	}
+
 	//@author s202772 - Gustav Kinch
 	@Given("that the merchant is registered with DTU Pay")
 	public void thatTheMerchantIsRegisteredWithDTUPay() throws Exception {
@@ -345,11 +388,42 @@ public class DTUPaySteps {
 			this.e = ex;
 		}
 	}
+
+	//@author s213578 - Johannes Pedersen
+	@When("both customers requests {int} and {int} tokens respectively")
+	public void bothCustomersRequestsAndTokensRespectively(int arg0, int arg1) {
+		try {
+			customerTokens = dtuPayCustomer.getNewTokens(customer, arg0);
+		} catch (Exception ex) {
+			this.e = ex;
+		}
+		try {
+			customer2Tokens = dtuPayCustomer.getNewTokens(customer2, arg1);
+		} catch (Exception ex2) {
+			ex2.printStackTrace();
+			this.e2 = ex2;
+		}
+	}
+
 	//@author s213578 - Johannes Pedersen
 	@Then("{int} unique tokens is returned")
 	public void uniqueTokensIsReturned(int arg0) {
 		assertEquals(arg0, customerTokens.size());
 	}
+
+	//@author s212643 - Xingguang Geng
+	@Then("{int} unique tokens is returned to the first customer")
+	public void uniqueTokensIsReturnedToTheFirstCustomer(int arg0) {
+		assertEquals(arg0, customerTokens.size());
+	}
+
+	//@author s164422 - Thomas Bergen
+	@Then("{int} unique tokens is returned to the second customer")
+	public void uniqueTokensIsReturnedToTheSecondCustomer(int arg0) throws InterruptedException {
+		TimeUnit.MILLISECONDS.sleep(100);
+		assertEquals(arg0, customer2Tokens.size());
+	}
+
 	//@author s212643 - Xingguang Geng
 	@Given("the customer generates {int} tokens")
 	public void theCustomerGeneratesTokens(int amount) {
@@ -435,6 +509,7 @@ public class DTUPaySteps {
 			assertTrue(report.contains(p));
 		}
 	}
+
 
 
 }
