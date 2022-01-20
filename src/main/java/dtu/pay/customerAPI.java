@@ -26,6 +26,7 @@ public class customerAPI {
 		report = c.target(serverHost + ":8082/");
 		token = c.target(serverHost + ":8083/");
 	}
+
 	//@author s174293 - Kasper Jørgensen
 	public String registerCustomer(String firstName, String lastName, String bankID, String CPR) throws Exception {
 		Response response = account.path("customers").request().post(Entity.entity(new DtuPayUser(firstName,lastName,null,bankID,CPR), MediaType.APPLICATION_JSON));
@@ -36,8 +37,8 @@ public class customerAPI {
 		}
 	}
 
-	public void deleteCustomer(String dtuPayID) throws Exception {
-		Response r = account.path("customers").path(dtuPayID).request().delete();
+	public void deleteCustomer(String cid) throws Exception {
+		Response r = account.path("customers").path(cid).request().delete();
 		if (r.getStatusInfo() != Response.Status.OK){
 			throw new Exception(r.readEntity(String.class));
 		}
@@ -52,6 +53,7 @@ public class customerAPI {
 		}
 		return false;
 	}
+
 	//@author s215949 - Zelin Li
 	public boolean customerIsRegistered(String cid) {
 		List<DtuPayUser> customers = account.path("customers").request().get(new GenericType<List<DtuPayUser>>(){});
@@ -59,8 +61,8 @@ public class customerAPI {
 	}
 
 	//@author s213578 - Johannes Pedersen
-	public List<String> getNewTokens(DtuPayUser customer, int n) throws Exception {
-		Response r = token.path("tokens").path(customer.getDtuPayID()).request()
+	public List<String> getNewTokens(String cid, int n) throws Exception {
+		Response r = token.path("tokens").path(cid).request()
 				.post(Entity.entity(n, MediaType.APPLICATION_JSON));
 		if (r.getStatusInfo() == Response.Status.OK){
 			return r.readEntity(new GenericType<List<String>>(){});
@@ -69,12 +71,13 @@ public class customerAPI {
 			throw new Exception(r.readEntity(String.class));
 		}
 	}
+
 	//@author s212643 - Xingguang Geng
-	public List<Payment> getReport(String customerID) {
-		List<Payment> payments = report.path("reports/customers").path(customerID).
-				                        request().get(new GenericType<List<Payment>>(){});
-		return payments;
+	public List<Payment> getReport(String cid) {
+		return report
+				.path("reports/customers")
+				.path(cid)
+				.request()
+				.get(new GenericType<List<Payment>>(){});
 	}
-
-
 }

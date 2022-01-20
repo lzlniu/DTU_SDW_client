@@ -21,7 +21,7 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
 public class DTUPaySteps {
-	final boolean runningLocally = true;
+	final boolean runningLocally = false;
 	List<String> bankAccounts;
 	customerAPI dtuPayCustomer = new customerAPI(runningLocally);
 	merchantAPI dtuPayMerchant = new merchantAPI(runningLocally);
@@ -230,7 +230,7 @@ public class DTUPaySteps {
 	@When("the merchant registers with DTU Pay")
 	public void theMerchantRegistersWithDTUPay() {
 		try {
-			merchant.setDtuPayID(dtuPayMerchant.registerMerchants(
+			merchant.setDtuPayID(dtuPayMerchant.registerMerchant(
 					merchant.getFirstName(),
 					merchant.getLastName(),
 					merchant.getBankID(),
@@ -306,7 +306,7 @@ public class DTUPaySteps {
 	@Given("that the merchant is registered with DTU Pay")
 	public void thatTheMerchantIsRegisteredWithDTUPay() throws Exception {
 		try {
-			merchant.setDtuPayID(dtuPayMerchant.registerMerchants(
+			merchant.setDtuPayID(dtuPayMerchant.registerMerchant(
 					merchant.getFirstName(),
 					merchant.getLastName(),
 					merchant.getBankID(),
@@ -321,7 +321,7 @@ public class DTUPaySteps {
 	@Given("that the second merchant is registered with DTU Pay")
 	public void thatTheSecondMerchantIsRegisteredWithDTUPay() {
 		try {
-			merchant2.setDtuPayID(dtuPayMerchant.registerMerchants(
+			merchant2.setDtuPayID(dtuPayMerchant.registerMerchant(
 					merchant2.getFirstName(),
 					merchant2.getLastName(),
 					merchant2.getBankID(),
@@ -533,7 +533,7 @@ public class DTUPaySteps {
 	@When("the customer requests to generate {int} tokens")
 	public void theCustomerRequestsToGenerateTokens(int arg0) {
 		try {
-			customerTokens = dtuPayCustomer.getNewTokens(customer, arg0);
+			customerTokens = dtuPayCustomer.getNewTokens(customer.getDtuPayID(), arg0);
 		} catch (Exception ex) {
 			this.e = ex;
 		}
@@ -543,12 +543,12 @@ public class DTUPaySteps {
 	@When("both customers requests {int} and {int} tokens respectively")
 	public void bothCustomersRequestsAndTokensRespectively(int arg0, int arg1) {
 		try {
-			customerTokens = dtuPayCustomer.getNewTokens(customer, arg0);
+			customerTokens = dtuPayCustomer.getNewTokens(customer.getDtuPayID(), arg0);
 		} catch (Exception ex) {
 			this.e = ex;
 		}
 		try {
-			customer2Tokens = dtuPayCustomer.getNewTokens(customer2, arg1);
+			customer2Tokens = dtuPayCustomer.getNewTokens(customer2.getDtuPayID(), arg1);
 		} catch (Exception ex2) {
 			ex2.printStackTrace();
 			this.e2 = ex2;
@@ -578,7 +578,7 @@ public class DTUPaySteps {
 	@Given("the customer generates {int} tokens")
 	public void theCustomerGeneratesTokens(int amount) {
 		try {
-			customerTokens = dtuPayCustomer.getNewTokens(customer, amount);
+			customerTokens = dtuPayCustomer.getNewTokens(customer.getDtuPayID(), amount);
 			assertEquals(amount, customerTokens.size());
 		} catch (Exception ex) {
 			this.e = ex;
@@ -587,14 +587,14 @@ public class DTUPaySteps {
 	//@author s164422 - Thomas Bergen
 	@Given("customer has tokens")
 	public void customerHasTokens() throws Exception {
-		customerTokens = dtuPayCustomer.getNewTokens(customer, 5);
+		customerTokens = dtuPayCustomer.getNewTokens(customer.getDtuPayID(), 5);
 		assertTrue(!customerTokens.isEmpty());
 	}
 
 	//@author s212643 - Xingguang Geng
 	@Given("the second customer has tokens")
 	public void theSecondCustomerHasTokens() throws Exception {
-		customer2Tokens = dtuPayCustomer.getNewTokens(customer2, 5);
+		customer2Tokens = dtuPayCustomer.getNewTokens(customer2.getDtuPayID(), 5);
 		assertTrue(!customer2Tokens.isEmpty());
 	}
 

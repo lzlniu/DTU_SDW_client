@@ -14,7 +14,6 @@ public class merchantAPI {
     Client c;
     WebTarget account, payment, report, token;
 
-
     //@author s213578 - Johannes Pedersen
     public merchantAPI(boolean runningLocally) {
         c = ClientBuilder.newClient();
@@ -25,8 +24,9 @@ public class merchantAPI {
         report = c.target(serverHost + ":8082/");
         token = c.target(serverHost + ":8083/");
     }
+
     //@author s212643 - Xingguang Geng
-    public String registerMerchants(String firstName, String lastName, String bankID, String CPR) throws Exception {
+    public String registerMerchant(String firstName, String lastName, String bankID, String CPR) throws Exception {
         Response response = account.path("merchants").request().post(Entity.entity(new DtuPayUser(firstName,lastName,null,bankID,CPR), MediaType.APPLICATION_JSON));
         if (response.getStatusInfo() == Response.Status.OK){
             return response.readEntity(String.class);
@@ -34,15 +34,16 @@ public class merchantAPI {
             throw new Exception(response.readEntity(String.class));
         }
     }
+
     //@author s164422 - Thomas Bergen
     public boolean merchantIsRegistered(String mid) {
         List<DtuPayUser> merchants= account.path("merchants").request().get(new GenericType<List<DtuPayUser>>(){});
-        return isUserThere(merchants,mid);
+        return isUserThere(merchants, mid);
     }
 
     //@author s215949 - Zelin Li
-    public void deleteMerchant(String dtuPayID) throws Exception {
-        Response r = account.path("merchants").path(dtuPayID).request().delete();
+    public void deleteMerchant(String mid) throws Exception {
+        Response r = account.path("merchants").path(mid).request().delete();
         if (r.getStatusInfo() != Response.Status.OK){
             throw new Exception(r.readEntity(String.class));
         }
@@ -57,6 +58,7 @@ public class merchantAPI {
         }
         return false;
     }
+
     //@author s202772 - Gustav Kinch
     public boolean pay(BigDecimal amount, String customerToken, String mid) throws Exception {
         Payment p = new Payment(customerToken, mid, amount);
@@ -83,18 +85,23 @@ public class merchantAPI {
     }
 
     //@author s215949 - Zelin Li
-    public List<Payment> getSuperReport(String password){
+    public List<Payment> getSuperReport(String password) {
         if (password.equals("managerPSW")) { //emulates authenticating manager
-            return report.path("reports").request().get(new GenericType<List<Payment>>() {
-            });
-        }else{
+            return report
+                    .path("reports")
+                    .request()
+                    .get(new GenericType<List<Payment>>(){});
+        } else {
             return null;
         }
     }
+
     //@author s213578 - Johannes Pedersen
     public List<Payment> getReport(String merchantID) {
-        List<Payment> payments = report.path("reports/merchants").path(merchantID).
-                request().get(new GenericType<List<Payment>>(){});
-        return payments;
+        return report
+                .path("reports/merchants")
+                .path(merchantID)
+                .request()
+                .get(new GenericType<List<Payment>>(){});
     }
 }
