@@ -1,4 +1,4 @@
-Feature: Payment
+Feature: User management
 
   #@author s164422 - Thomas Bergen
   Scenario: Successfully create customer
@@ -20,6 +20,20 @@ Feature: Payment
     Given a merchant with no bank account
     When the merchant registers with DTU Pay
     Then an error message is returned saying "must have a bank account to register"
+  #@author s164422 - Thomas Bergen
+  Scenario: Delete customer
+    Given a customer with a bank account with balance 500.0
+    And that the customer is registered with DTU Pay
+    Then that customer is registered with DTU Pay
+    When the customer is deleted
+    Then that customer is not registered with DTU Pay
+  #@author s174293 - Kasper Jørgensen
+  Scenario: Delete merchant
+    Given a merchant with a bank account with balance 500.0
+    And that the merchant is registered with DTU Pay
+    Then that merchant is registered with DTU Pay
+    When the merchant is deleted
+    Then that merchant is not registered with DTU Pay
   #@author s213578 - Johannes Pedersen
   Scenario: Generate 4 tokens for new customer
     Given a customer with a bank account with balance 500.0

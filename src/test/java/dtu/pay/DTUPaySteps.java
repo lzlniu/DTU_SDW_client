@@ -73,7 +73,7 @@ public class DTUPaySteps {
 	public void aCustomerWithABankAccountWithBalance(BigDecimal bigDecimal) {
 	    customer.setFirstName("Frankie");
 		customer.setLastName("Hansen");
-		customer.setCPR("090701-7672");
+		customer.setCPR("090701-7674");
 	    try {
 			customer.setBankID(bank.createAccountWithBalance(
 					createUser(customer.getCPR(),
@@ -189,6 +189,19 @@ public class DTUPaySteps {
 	public void thatCustomerIsRegisteredWithDTUPay() {
 	    assertTrue(dtuPayCustomer.customerIsRegistered(customer.getDtuPayID()));
 	}
+
+	//@author s212643 - Xingguang Geng
+	@Then("that customer is not registered with DTU Pay")
+	public void thatCustomerIsNotRegisteredWithDTUPay() {
+		assertFalse(dtuPayCustomer.customerIsRegistered(customer.getDtuPayID()));
+	}
+
+	//@author s174293 - Kasper Jørgensen
+	@Then("that merchant is not registered with DTU Pay")
+	public void thatMerchantIsNotRegisteredWithDTUPay() {
+		assertFalse(dtuPayMerchant.merchantIsRegistered(merchant.getDtuPayID()));
+	}
+
 	//@author s202772 - Gustav Kinch
 	@Given("a customer with no bank account")
 	public void aCustomerWithNoBankAccount() {
@@ -200,7 +213,7 @@ public class DTUPaySteps {
 	public void aMerchantWithABankAccountWithBalance(BigDecimal bigDecimal) {
 		merchant.setFirstName("Benny");
 		merchant.setLastName("Bonghead");
-		merchant.setCPR("696969-4200");
+		merchant.setCPR("696969-4202");
 		try {
 			merchant.setBankID(bank.createAccountWithBalance(
 					createUser( merchant.getCPR(),
@@ -227,6 +240,27 @@ public class DTUPaySteps {
 			this.e = e;
 		}
 	}
+
+	//@author s202772 - Gustav Kinch
+	@When("the customer is deleted")
+	public void theCustomerIsDeleted() {
+		try{
+			dtuPayCustomer.deleteCustomer(customer.getDtuPayID());
+		} catch (Exception e){
+			this.e = e;
+		}
+	}
+
+	//@author s164422 - Thomas Bergen
+	@When("the merchant is deleted")
+	public void theMerchantIsDeleted() {
+		try{
+			dtuPayMerchant.deleteMerchant(merchant.getDtuPayID());
+		} catch (Exception e){
+			this.e = e;
+		}
+	}
+
 	//@author s212643 - Xingguang Geng
 	@Then("that merchant is registered with DTU Pay")
 	public void thatMerchantIsRegisteredWithDTUPay() {
@@ -404,6 +438,23 @@ public class DTUPaySteps {
 			this.e = e;
 		}
 	}
+
+	//@author s215949 - Zelin Li
+	@When("a refund is requested for {bigdecimal} kr")
+	public void aRefundIsRequestedForKr(BigDecimal amount) {
+		try{
+			successful = dtuPayMerchant.refund(amount,customerTokens.get(0),merchant.getDtuPayID());
+
+			Payment p = new Payment(customerTokens.get(0), merchant.getDtuPayID(), amount);
+			if (!customersPayments.containsKey(customer.getDtuPayID())) customersPayments.put(customer.getDtuPayID(),new ArrayList<>());
+			customersPayments.get(customer.getDtuPayID()).add(p);
+			payments.add(p);
+		}catch (Exception e) {
+			successful = false;
+			this.e = e;
+		}
+	}
+
 	//@author s213578 - Johannes Pedersen
 	@Then("the payment is successful")
 	public void thePaymentIsSuccessful() {
@@ -617,6 +668,9 @@ public class DTUPaySteps {
 		}
 	}
 
-
+	@Then("the refund is successful")
+	public void theRefundIsSuccessful() {
+		assertTrue(successful);
+	}
 }
 

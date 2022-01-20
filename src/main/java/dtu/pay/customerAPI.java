@@ -35,8 +35,16 @@ public class customerAPI {
 			throw new Exception(response.readEntity(String.class));
 		}
 	}
+
+	public void deleteCustomer(String dtuPayID) throws Exception {
+		Response r = account.path("customers").path(dtuPayID).request().delete();
+		if (r.getStatusInfo() != Response.Status.OK){
+			throw new Exception(r.readEntity(String.class));
+		}
+	}
+
 	//@author s202772 - Gustav Kinch
-	public Boolean isUserThere(List<DtuPayUser> list, String id){
+	private Boolean isUserThere(List<DtuPayUser> list, String id){
 		for (DtuPayUser dtuPayUser : list) {
 			if (dtuPayUser.getDtuPayID().equals(id)){
 				return true;
@@ -67,4 +75,6 @@ public class customerAPI {
 				                        request().get(new GenericType<List<Payment>>(){});
 		return payments;
 	}
+
+
 }

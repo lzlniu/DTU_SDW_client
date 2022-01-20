@@ -39,6 +39,15 @@ public class merchantAPI {
         List<DtuPayUser> merchants= account.path("merchants").request().get(new GenericType<List<DtuPayUser>>(){});
         return isUserThere(merchants,mid);
     }
+
+    //@author s215949 - Zelin Li
+    public void deleteMerchant(String dtuPayID) throws Exception {
+        Response r = account.path("merchants").path(dtuPayID).request().delete();
+        if (r.getStatusInfo() != Response.Status.OK){
+            throw new Exception(r.readEntity(String.class));
+        }
+    }
+
     //@author s174293 - Kasper Jørgensen
     public Boolean isUserThere(List<DtuPayUser> list, String id){
         for (DtuPayUser dtuPayUser : list) {
@@ -59,11 +68,23 @@ public class merchantAPI {
             throw new Exception(response.readEntity(String.class));
         }
     }
+
+    //@author s164422 - Thomas Bergen
+    public boolean refund(BigDecimal amount, String customerToken, String mid) throws Exception {
+        Payment p = new Payment(customerToken, mid, amount);
+        Response response = payment.path("payments/refunds").request().
+                post(Entity.entity(p, MediaType.APPLICATION_JSON));
+        if (response.getStatusInfo() == Response.Status.OK) {
+            return true;
+        } else {
+            System.out.println(response.getStatus());
+            throw new Exception(response.readEntity(String.class));
+        }
+    }
+
     //@author s215949 - Zelin Li
     public List<Payment> getSuperReport(String password){
-        System.out.printf("ss");
         if (password.equals("managerPSW")) { //emulates authenticating manager
-            System.out.println("heu");
             return report.path("reports").request().get(new GenericType<List<Payment>>() {
             });
         }else{

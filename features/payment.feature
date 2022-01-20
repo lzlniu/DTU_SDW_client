@@ -110,3 +110,15 @@ Feature: Payment
     And the balance of the second customer at the bank is 627.97 kr
     And the balance of the second merchant at the bank is 2372.03 kr
 
+  #@author s213578 - Johannes Pedersen
+  Scenario: Successful refund
+    Given a customer with name "cus" "tomer" and CPR "823573-6514" and a bank account with balance 1000.0
+    And that the customer is registered with DTU Pay
+    Given a merchant with name "Ben" "Gjs" and CPR "383838-1234" and a bank account with balance 2000.0
+    And that the merchant is registered with DTU Pay
+    Given customer has tokens
+    When a refund is requested for 100.00 kr
+    Then the refund is successful
+    And the balance of the customer at the bank is 1100.00 kr
+    And the balance of the merchant at the bank is 1900.00 kr
+
