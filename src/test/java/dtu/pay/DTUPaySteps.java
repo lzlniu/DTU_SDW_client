@@ -10,6 +10,7 @@ import java.sql.Time;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import dtu.ws.fastmoney.*;
@@ -37,6 +38,7 @@ public class DTUPaySteps {
 
 	List<String> customerTokens = new ArrayList<>();
 	List<String> customer2Tokens = new ArrayList<>();
+	int used_token_num = 0;
 	HashMap<String, List<Payment>> customersPayments;
 
 	//@author s164422 - Thomas Bergen
@@ -370,17 +372,32 @@ public class DTUPaySteps {
 	public void aMerchantWithId(String mid) {
 	this.merchant.setDtuPayID(mid);
 	}
-	//@author s202772 - Gustav Kinch
-	@When("the merchant initiates a payment for {bigdecimal} kr by the customer")
-	public void theMerchantInitiatesAPaymentForKrByTheCustomer(BigDecimal amount) {
-		try{
-			successful = dtuPayMerchant.pay(amount,customerTokens.get(0),merchant.getDtuPayID());
 
+	@When("the merchant initiates a payment for {bigdecimal} kr by the customer with a fixed certain token")
+	public void theMerchantInitiatesAPaymentForKrByTheCustomerWithAFixedCertainToken(BigDecimal amount) {
+		try {
+			successful = dtuPayMerchant.pay(amount,customerTokens.get(0),merchant.getDtuPayID());
 			Payment p = new Payment(customerTokens.get(0), merchant.getDtuPayID(), amount);
 			if (!customersPayments.containsKey(customer.getDtuPayID())) customersPayments.put(customer.getDtuPayID(),new ArrayList<>());
 			customersPayments.get(customer.getDtuPayID()).add(p);
 			payments.add(p);
-		}catch (Exception e) {
+		} catch (Exception e) {
+			successful = false;
+			this.e = e;
+		}
+	}
+
+	//@author s202772 - Gustav Kinch
+	@When("the merchant initiates a payment for {bigdecimal} kr by the customer")
+	public void theMerchantInitiatesAPaymentForKrByTheCustomer(BigDecimal amount) {
+		try {
+			successful = dtuPayMerchant.pay(amount,customerTokens.get(used_token_num),merchant.getDtuPayID());
+			Payment p = new Payment(customerTokens.get(used_token_num), merchant.getDtuPayID(), amount);
+			used_token_num++;
+			if (!customersPayments.containsKey(customer.getDtuPayID())) customersPayments.put(customer.getDtuPayID(),new ArrayList<>());
+			customersPayments.get(customer.getDtuPayID()).add(p);
+			payments.add(p);
+		} catch (Exception e) {
 			successful = false;
 			this.e = e;
 		}
@@ -390,14 +407,14 @@ public class DTUPaySteps {
 	@When("the merchant initiates a payment for {bigdecimal} kr by the customer and the second merchant initiates a payment for {bigdecimal} by the second customer")
 	public void theMerchantInitiatesAPaymentForKrByTheCustomerAndTheSecondMerchantInitiatesAPaymentForByTheSecondCustomer(BigDecimal amount1, BigDecimal amount2) throws InterruptedException {
 		var thread1 = new Thread(() -> {
-			try{
-				successful = dtuPayMerchant.pay(amount1,customerTokens.get(0),merchant.getDtuPayID());
-
-				Payment p = new Payment(customerTokens.get(0), merchant.getDtuPayID(), amount1);
+			try {
+				successful = dtuPayMerchant.pay(amount1,customerTokens.get(used_token_num),merchant.getDtuPayID());
+				Payment p = new Payment(customerTokens.get(used_token_num), merchant.getDtuPayID(), amount1);
+				used_token_num++;
 				if (!customersPayments.containsKey(customer.getDtuPayID())) customersPayments.put(customer.getDtuPayID(),new ArrayList<>());
 				customersPayments.get(customer.getDtuPayID()).add(p);
 				payments.add(p);
-			}catch (Exception e) {
+			} catch (Exception e) {
 				successful = false;
 				this.e = e;
 				System.out.println(e);
@@ -426,14 +443,14 @@ public class DTUPaySteps {
 	//@author s215949 - Zelin Li
 	@When("the merchant initiates a second payment for {bigdecimal} kr by the customer")
 	public void theMerchantInitiatesASecondPaymentForKrByTheCustomer(BigDecimal amount) {
-		try{
-			successful = dtuPayMerchant.pay(amount,customerTokens.get(1),merchant.getDtuPayID());
-
-			Payment p = new Payment(customerTokens.get(1), merchant.getDtuPayID(), amount);
+		try {
+			successful = dtuPayMerchant.pay(amount,customerTokens.get(used_token_num),merchant.getDtuPayID());
+			Payment p = new Payment(customerTokens.get(used_token_num), merchant.getDtuPayID(), amount);
+			used_token_num++;
 			if (!customersPayments.containsKey(customer.getDtuPayID())) customersPayments.put(customer.getDtuPayID(),new ArrayList<>());
 			customersPayments.get(customer.getDtuPayID()).add(p);
 			payments.add(p);
-		}catch (Exception e) {
+		} catch (Exception e) {
 			successful = false;
 			this.e = e;
 		}
@@ -442,14 +459,14 @@ public class DTUPaySteps {
 	//@author s215949 - Zelin Li
 	@When("a refund is requested for {bigdecimal} kr")
 	public void aRefundIsRequestedForKr(BigDecimal amount) {
-		try{
-			successful = dtuPayMerchant.refund(amount,customerTokens.get(0),merchant.getDtuPayID());
-
-			Payment p = new Payment(customerTokens.get(0), merchant.getDtuPayID(), amount);
+		try {
+			successful = dtuPayMerchant.refund(amount,customerTokens.get(used_token_num),merchant.getDtuPayID());
+			Payment p = new Payment(customerTokens.get(used_token_num), merchant.getDtuPayID(), amount.negate());
+			used_token_num++;
 			if (!customersPayments.containsKey(customer.getDtuPayID())) customersPayments.put(customer.getDtuPayID(),new ArrayList<>());
 			customersPayments.get(customer.getDtuPayID()).add(p);
 			payments.add(p);
-		}catch (Exception e) {
+		} catch (Exception e) {
 			successful = false;
 			this.e = e;
 		}
@@ -588,14 +605,14 @@ public class DTUPaySteps {
 	@Given("customer has tokens")
 	public void customerHasTokens() throws Exception {
 		customerTokens = dtuPayCustomer.getNewTokens(customer.getDtuPayID(), 5);
-		assertTrue(!customerTokens.isEmpty());
+		assertFalse(customerTokens.isEmpty());
 	}
 
 	//@author s212643 - Xingguang Geng
 	@Given("the second customer has tokens")
 	public void theSecondCustomerHasTokens() throws Exception {
 		customer2Tokens = dtuPayCustomer.getNewTokens(customer2.getDtuPayID(), 5);
-		assertTrue(!customer2Tokens.isEmpty());
+		assertFalse(customer2Tokens.isEmpty());
 	}
 
 	//@author s174293 - Kasper Jørgensen
@@ -645,7 +662,7 @@ public class DTUPaySteps {
 	@Then("the report contains only payments with that merchant")
 	public void theReportContainsOnlyPaymentsWithThatMerchant() {
 		System.out.println(report);
-		for (Payment p : report){  //check that all payments in report belong to current customer
+		for (Payment p : report){  //check that all payments in report belong to current merchant
 			assertTrue(payments.contains(p));
 			assertEquals(merchant.getDtuPayID(), p.getMerchantID());
 		}
@@ -671,6 +688,20 @@ public class DTUPaySteps {
 	@Then("the refund is successful")
 	public void theRefundIsSuccessful() {
 		assertTrue(successful);
+	}
+
+	@And("the report contains records with value of {bigdecimal} kr and {bigdecimal} kr")
+	public void theReportContainsRecordsWithValueOfKrAndKr(BigDecimal pay_value, BigDecimal refund_value) {
+		boolean have_payment = false, have_refund = false;
+		for (Payment p : report){
+			if (Objects.equals(p.getAmount(), pay_value)) {
+				have_payment = true;
+			} else if (Objects.equals(p.getAmount(), refund_value)) {
+				have_refund = true;
+			}
+		}
+		assertTrue(have_payment);
+		assertTrue(have_refund);
 	}
 }
 

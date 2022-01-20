@@ -67,3 +67,25 @@ Feature: User management
     When both customers requests 3 and 5 tokens respectively
     Then 3 unique tokens is returned to the first customer
     And 5 unique tokens is returned to the second customer
+  #@author s215949 - Zelin Li
+  Scenario: whole process
+    Given a customer with name "Deer" "Li" and CPR "121299-9999" and a bank account with balance 123.4
+    And that the customer is registered with DTU Pay
+    When the customer requests to generate 3 tokens
+    Then 3 unique tokens is returned
+    Given a merchant with a bank account with balance 2000.0
+    And that the merchant is registered with DTU Pay
+    When the merchant initiates a payment for 23.1 kr by the customer
+    Then the payment is successful
+    And the balance of the customer at the bank is 100.3 kr
+    And the balance of the merchant at the bank is 2023.1 kr
+    When a refund is requested for 100.0 kr
+    Then the refund is successful
+    And the balance of the customer at the bank is 200.3 kr
+    And the balance of the merchant at the bank is 1923.1 kr
+    When the customer asks for a report
+    Then the report contains only payments with that customer
+    And the report contains records with value of 23.1 kr and -100.0 kr
+    When the merchant asks for a report
+    Then the report contains only payments with that merchant
+    And the report contains records with value of 23.1 kr and -100.0 kr

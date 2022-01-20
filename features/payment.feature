@@ -36,11 +36,11 @@ Feature: Payment
     Given a merchant with a bank account with balance 2000.0
     And that the merchant is registered with DTU Pay
     Given customer has tokens
-    When the merchant initiates a payment for 100.0 kr by the customer
+    When the merchant initiates a payment for 100.0 kr by the customer with a fixed certain token
     Then the payment is successful
     And the balance of the customer at the bank is 900.0 kr
     And the balance of the merchant at the bank is 2100.0 kr
-    When the merchant initiates a payment for 200.0 kr by the customer
+    When the merchant initiates a payment for 200.0 kr by the customer with a fixed certain token
     Then the payment is not successful
     And an error message is returned saying "Customer token not valid"
   #@author s164422 - Thomas Bergen
